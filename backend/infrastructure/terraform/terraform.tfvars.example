@@ -1,0 +1,33 @@
+aws_region  = "us-east-1"
+environment = "production"
+
+# VPC Configuration
+vpc_cidr           = "10.0.0.0/16"
+availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+private_subnets    = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+public_subnets     = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+
+# EKS Configuration
+eks_cluster_version = "1.28"
+eks_node_groups = {
+  general = {
+    desired_size   = 3
+    min_size       = 2
+    max_size       = 10
+    instance_types = ["t3.large"]
+  }
+}
+
+# RDS Configuration
+rds_instance_class    = "db.t3.medium"
+rds_allocated_storage = 100
+database_name         = "transaction_monitor"
+database_username     = "transaction_user"
+
+# Redis Configuration
+redis_node_type  = "cache.t3.medium"
+redis_num_nodes  = 2
+
+# Kafka Configuration
+kafka_broker_count   = 3
+kafka_instance_type  = "kafka.m5.large"
