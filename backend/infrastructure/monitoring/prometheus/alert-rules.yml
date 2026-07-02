@@ -1,0 +1,165 @@
+groups:
+  - name: backend_alerts
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }} errors per second for {{ $labels.pod }}"
+
+      - alert: HighResponseTime
+        expr: |
+          histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value }}s for {{ $labels.pod }}"
+
+      - alert: PodDown
+        expr: |
+          up{job="backend"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend pod is down"
+          description: "Pod {{ $labels.pod }} has been down for more than 5 minutes"
+
+      - alert: HighCPUUsage
+        expr: |
+          rate(process_cpu_seconds_total[5m]) > 0.8
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value | humanizePercentage }} for {{ $labels.pod }}"
+
+      - alert: HighMemoryUsage
+        expr: |
+          process_resident_memory_bytes / 1e9 > 2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value }}GB for {{ $labels.pod }}"
+
+  - name: transaction_alerts
+    interval: 30s
+    rules:
+      - alert: HighTransactionRejectionRate
+        expr: |
+          rate(transactions_total{status="rejected"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High transaction rejection rate"
+          description: "Rejection rate is {{ $value }} transactions per second"
+
+      - alert: HighRiskTransactions
+        expr: |
+          rate(transactions_total{risk_level="high"}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High risk transactions detected"
+          description: "High risk transaction rate is {{ $value }} per second"
+
+      - alert: AlertProcessingDelay
+        expr: |
+          rate(alert_processing_duration_seconds[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alert processing delay detected"
+          description: "Average alert processing time is {{ $value }}s"
+
+  - name: kafka_alerts
+    interval: 30s
+    rules:
+      - alert: KafkaConsumerLag
+        expr: |
+          kafka_consumergroup_lag > 1000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kafka consumer lag is high"
+          description: "Consumer lag is {{ $value }} messages for {{ $labels.consumergroup }}"
+
+      - alert: KafkaPartitionOffline
+        expr: |
+          kafka_topic_partition_in_sync_replica < 2
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Kafka partition has insufficient replicas"
+          description: "Partition {{ $labels.partition }} of topic {{ $labels.topic }} has {{ $value }} in-sync replicas"
+
+  - name: database_alerts
+    interval: 30s
+    rules:
+      - alert: DatabaseDown
+        expr: |
+          up{job="postgres"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL database is down"
+          description: "Database has been unreachable for more than 2 minutes"
+
+      - alert: HighDatabaseConnections
+        expr: |
+          pg_stat_activity_count > 80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of database connections"
+          description: "Active connections: {{ $value }}"
+
+      - alert: SlowQueries
+        expr: |
+          rate(pg_stat_statements_mean_exec_time_seconds[5m]) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow database queries detected"
+          description: "Average query execution time is {{ $value }}s"
+
+  - name: redis_alerts
+    interval: 30s
+    rules:
+      - alert: RedisDown
+        expr: |
+          up{job="redis"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down"
+          description: "Redis has been unreachable for more than 2 minutes"
+
+      - alert: HighRedisMemoryUsage
+        expr: |
+          redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Redis memory usage"
+          description: "Memory usage is {{ $value | humanizePercentage }}"
