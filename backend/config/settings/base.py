@@ -246,3 +246,6 @@ OTEL_SERVICE_NAME = os.getenv('OTEL_SERVICE_NAME', 'transaction-monitor-backend'
 OTEL_EXPORTER_OTLP_ENDPOINT = os.getenv('OTEL_EXPORTER_OTLP_ENDPOINT', 'http://localhost:4317')
 
 RATE_LIMIT_ENABLE = True
+
+RUST_RISK_SCORER_URL = os.getenv('RUST_RISK_SCORER_URL', 'http://localhost:8001')
+RUST_RISK_SCORER_ENABLED = os.getenv('RUST_RISK_SCORER_ENABLED', 'false').lower() == 'true'

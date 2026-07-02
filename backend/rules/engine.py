@@ -1,6 +1,7 @@
 import logging
-from typing import List
+from typing import List, Optional
 from django.db import transaction as db_transaction
+from django.conf import settings
 from apps.transactions.models import Transaction
 from apps.alerts.models import Alert, AuditLog
 from .models import RuleConfiguration
@@ -11,8 +12,11 @@ logger = logging.getLogger(__name__)
 
 
 class RuleEngine:
-    def __init__(self):
+    def __init__(self, use_rust_scorer: bool = False):
         self.rules: List[BaseRule] = []
+        self.use_rust_scorer = use_rust_scorer or getattr(
+            settings, 'RUST_RISK_SCORER_ENABLED', False
+        )
         self.load_active_rules()
 
     def load_active_rules(self):
@@ -32,8 +36,13 @@ class RuleEngine:
     def evaluate_transaction(self, transaction: Transaction) -> dict:
         """
         Evaluate all rules against a transaction.
-        Returns a dict with triggered rules and updated risk score.
+        Uses Rust microservice if enabled, otherwise falls back to Python rules.
         """
+        if self.use_rust_scorer:
+            rust_result = self._evaluate_with_rust(transaction)
+            if rust_result:
+                return rust_result
+
         triggered_rules = []
         total_risk_score = 0
 
@@ -60,6 +69,35 @@ class RuleEngine:
             'risk_score': risk_score,
             'rules_count': len(triggered_rules)
         }
+
+    def _evaluate_with_rust(self, transaction: Transaction) -> Optional[dict]:
+        """Evaluate transaction using Rust microservice"""
+        try:
+            from core.rust_client import rust_scorer
+
+            transaction_data = {
+                'id': transaction.id,
+                'customer_id': transaction.customer.id,
+                'amount': transaction.amount,
+                'currency': transaction.currency,
+                'transaction_type': transaction.transaction_type,
+                'country_code': transaction.customer.country_code,
+                'customer_risk_level': transaction.customer.risk_level,
+                'is_blacklisted': transaction.customer.is_blacklisted,
+            }
+
+            result = rust_scorer.calculate_risk_score(transaction_data)
+            if result:
+                return {
+                    'triggered_rules': [],
+                    'risk_score': result['risk_score'],
+                    'rules_count': len(result.get('risk_factors', [])),
+                    'rust_result': result
+                }
+        except Exception as e:
+            logger.warning(f"Rust scorer failed, falling back to Python: {str(e)}")
+
+        return None
 
     @db_transaction.atomic
     def process_transaction(self, transaction: Transaction, user=None, request_meta=None):
