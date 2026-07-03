@@ -53,6 +53,13 @@ docker compose up -d event-processor
 echo "✅ Event processor started"
 echo ""
 
+echo "📋 Step 8: Starting Monitoring (Prometheus + Grafana)..."
+docker compose up -d prometheus grafana
+echo "Waiting for monitoring stack (10s)..."
+sleep 10
+echo "✅ Monitoring started"
+echo ""
+
 echo "╔════════════════════════════════════════════════════════════╗"
 echo "║                    HEALTH CHECKS                            ║"
 echo "╚════════════════════════════════════════════════════════════╝"
@@ -87,6 +94,12 @@ check_service "Backend API" "curl -f http://localhost:8000/health/"
 # Check Rust Scorer
 check_service "Rust Risk Scorer" "curl -f http://localhost:8001/health"
 
+# Check Prometheus
+check_service "Prometheus" "curl -f http://localhost:9090/-/ready"
+
+# Check Grafana
+check_service "Grafana" "curl -f http://localhost:3000/api/health"
+
 echo ""
 echo "╔════════════════════════════════════════════════════════════╗"
 echo "║                   RUNNING SERVICES                          ║"
@@ -102,10 +115,12 @@ echo "╚═══════════════════════�
 echo ""
 echo "🌐 Backend API:        http://localhost:8000"
 echo "📚 API Documentation:  http://localhost:8000/api/schema/swagger-ui/"
-echo "🔐 Admin Panel:        http://localhost:8000/admin/"
+echo "🔐 Admin Panel:        http://localhost:8000/admin/ (admin/admin123)"
 echo "💓 Health Check:       http://localhost:8000/health/"
 echo "📊 Metrics:            http://localhost:8000/metrics/"
 echo "🦀 Rust Risk Scorer:   http://localhost:8001"
+echo "📈 Prometheus:         http://localhost:9090"
+echo "📊 Grafana:            http://localhost:3000 (admin/admin)"
 echo "🗄️  PostgreSQL:         localhost:5433"
 echo "⚡ Redis:              localhost:6379"
 echo "📨 Kafka:              localhost:9092"
