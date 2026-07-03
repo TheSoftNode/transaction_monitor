@@ -84,7 +84,7 @@ services:
       ALLOWED_HOSTS: localhost,127.0.0.1,backend
       CORS_ALLOWED_ORIGINS: http://localhost:3000,http://localhost:5173
       RUST_RISK_SCORER_URL: http://rust-scorer:8001
-      RUST_RISK_SCORER_ENABLED: "false"
+      RUST_RISK_SCORER_ENABLED: "true"
     ports:
       - "8000:8000"
     volumes:
@@ -109,6 +109,7 @@ services:
     depends_on:
       - backend
       - kafka
+      - rust-scorer
     environment:
       DJANGO_ENV: development
       SECRET_KEY: dev-secret-key-change-in-production
@@ -120,6 +121,8 @@ services:
       DB_PORT: 5432
       REDIS_URL: redis://redis:6379/0
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      RUST_RISK_SCORER_URL: http://rust-scorer:8001
+      RUST_RISK_SCORER_ENABLED: "true"
     volumes:
       - .:/app
     command: python manage.py run_event_processor
