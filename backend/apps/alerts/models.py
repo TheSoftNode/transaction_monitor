@@ -52,7 +52,7 @@ class AuditLog(models.Model):
     actor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='audit_logs')
     details = models.JSONField(default=dict)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
-    user_agent = models.TextField(blank=True)
+    user_agent = models.TextField(null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:
