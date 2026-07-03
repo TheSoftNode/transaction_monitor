@@ -94,9 +94,10 @@ services:
              python manage.py runserver 0.0.0.0:8000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   event-processor:
     build:
@@ -106,10 +107,8 @@ services:
         BUILD_ENV: development
     container_name: transaction-monitor-event-processor
     depends_on:
-      backend:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
+      - backend
+      - kafka
     environment:
       DJANGO_ENV: development
       SECRET_KEY: dev-secret-key-change-in-production

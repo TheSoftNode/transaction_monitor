@@ -46,7 +46,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'middleware.request_id.RequestIDMiddleware',
     'middleware.exception_handler.ExceptionHandlerMiddleware',
-    'opentelemetry.instrumentation.django.middleware.DjangoMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -171,9 +170,6 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
         'LOCATION': REDIS_URL,
-        'OPTIONS': {
-            'parser_class': 'redis.connection.HiredisParser',
-        },
     }
 }
 
