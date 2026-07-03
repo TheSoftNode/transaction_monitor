@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'apps.alerts',
     'apps.monitoring',
     'rules',
+    'core',
 ]
 
 MIDDLEWARE = [
