@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from apps.customers.models import Customer
 from apps.transactions.models import Transaction
+from rules.models import RuleConfiguration
 from decimal import Decimal
 
 User = get_user_model()
@@ -32,9 +33,8 @@ def authenticated_client(api_client, user):
 def customer(db):
     return Customer.objects.create(
         customer_reference='CUST001',
+        full_name='John Doe',
         email='customer@example.com',
-        first_name='John',
-        last_name='Doe',
         country_code='USA',
         risk_level='low'
     )
@@ -68,10 +68,48 @@ def high_value_transaction(db, customer):
 def blacklisted_customer(db):
     return Customer.objects.create(
         customer_reference='CUST_BLACKLIST',
+        full_name='Jane Smith',
         email='blacklist@example.com',
-        first_name='Jane',
-        last_name='Smith',
         country_code='USA',
         risk_level='high',
         is_blacklisted=True
     )
+
+
+@pytest.fixture(autouse=True)
+def rule_configurations(db):
+    """Create rule configurations for testing - auto-applied to all tests"""
+    # Clear existing configs first
+    RuleConfiguration.objects.all().delete()
+
+    configs = [
+        RuleConfiguration.objects.create(
+            rule_name='HighValueTransactionRule',
+            is_active=True,
+            priority=100,
+            description='High value transaction check',
+            parameters={'threshold': 10000}
+        ),
+        RuleConfiguration.objects.create(
+            rule_name='VelocityRule',
+            is_active=True,
+            priority=90,
+            description='Velocity check',
+            parameters={'max_transactions': 5, 'time_window_minutes': 60}
+        ),
+        RuleConfiguration.objects.create(
+            rule_name='BlacklistedCountryRule',
+            is_active=True,
+            priority=80,
+            description='Geographic risk check',
+            parameters={}
+        ),
+        RuleConfiguration.objects.create(
+            rule_name='HighRiskCustomerRule',
+            is_active=True,
+            priority=70,
+            description='Customer risk level check',
+            parameters={}
+        ),
+    ]
+    return configs

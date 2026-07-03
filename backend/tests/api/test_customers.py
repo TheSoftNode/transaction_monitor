@@ -13,9 +13,8 @@ class TestCustomerAPI:
         url = reverse('customers:customer-list')
         data = {
             'customer_reference': 'CUST002',
+            'full_name': 'Alice Johnson',
             'email': 'newcustomer@example.com',
-            'first_name': 'Alice',
-            'last_name': 'Johnson',
             'country_code': 'GBR',
             'risk_level': 'low'
         }
@@ -30,9 +29,8 @@ class TestCustomerAPI:
         url = reverse('customers:customer-list')
         data = {
             'customer_reference': customer.customer_reference,
+            'full_name': 'Bob Smith',
             'email': 'different@example.com',
-            'first_name': 'Bob',
-            'last_name': 'Smith',
             'country_code': 'USA',
         }
         response = authenticated_client.post(url, data)
@@ -61,16 +59,15 @@ class TestCustomerAPI:
         url = reverse('customers:customer-detail', kwargs={'pk': customer.id})
         data = {
             'customer_reference': customer.customer_reference,
+            'full_name': 'Updated Name',
             'email': customer.email,
-            'first_name': 'UpdatedName',
-            'last_name': customer.last_name,
             'country_code': customer.country_code,
             'risk_level': 'medium'
         }
         response = authenticated_client.put(url, data)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data['first_name'] == 'UpdatedName'
+        assert response.data['full_name'] == 'Updated Name'
         assert response.data['risk_level'] == 'medium'
 
     def test_delete_customer(self, authenticated_client, customer):

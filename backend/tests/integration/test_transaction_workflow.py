@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 from apps.transactions.models import Transaction
 from apps.alerts.models import Alert
-from apps.customers.models import AuditLog
+from apps.alerts.models import AuditLog
 from decimal import Decimal
 
 
@@ -17,9 +17,8 @@ class TestTransactionWorkflow:
         customer_url = reverse('customers:customer-list')
         customer_data = {
             'customer_reference': 'CUST_FLOW',
+            'full_name': 'Flow Test',
             'email': 'flow@example.com',
-            'first_name': 'Flow',
-            'last_name': 'Test',
             'country_code': 'USA',
             'risk_level': 'low'
         }
@@ -166,7 +165,7 @@ class TestTransactionWorkflow:
 
         # Should trigger velocity rule
         triggered_rule_names = [r['rule'].name for r in result['triggered_rules']]
-        assert 'VelocityCheckRule' in triggered_rule_names
+        assert 'VelocityRule' in triggered_rule_names
 
     def test_alert_resolution_workflow(self, authenticated_client, transaction, user):
         """Test alert resolution workflow"""

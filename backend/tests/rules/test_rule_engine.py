@@ -7,9 +7,9 @@ from apps.transactions.models import Transaction
 from apps.alerts.models import Alert
 from rules.engine import RuleEngine
 from rules.plugins.high_value import HighValueTransactionRule
-from rules.plugins.velocity import VelocityCheckRule
-from rules.plugins.geographic import GeographicRiskRule
-from rules.plugins.customer_risk import CustomerRiskRule
+from rules.plugins.velocity import VelocityRule
+from rules.plugins.geographic import BlacklistedCountryRule
+from rules.plugins.customer_risk import HighRiskCustomerRule
 
 
 @pytest.mark.django_db
@@ -72,7 +72,7 @@ class TestRuleEngine:
             customer=customer
         ).order_by('-created_at').first()
 
-        rule = VelocityCheckRule()
+        rule = VelocityRule()
         triggered = rule.evaluate(latest_transaction)
 
         assert triggered is True
@@ -81,9 +81,8 @@ class TestRuleEngine:
         """Test geographic risk rule"""
         high_risk_customer = Customer.objects.create(
             customer_reference='CUST_HIGH_RISK_GEO',
+            full_name='Risk Customer',
             email='highrisk@example.com',
-            first_name='Risk',
-            last_name='Customer',
             country_code='IRN'  # High risk country
         )
 
@@ -95,7 +94,7 @@ class TestRuleEngine:
             transaction_type='deposit'
         )
 
-        rule = GeographicRiskRule()
+        rule = BlacklistedCountryRule()
         triggered = rule.evaluate(transaction)
 
         assert triggered is True
@@ -110,7 +109,7 @@ class TestRuleEngine:
             transaction_type='deposit'
         )
 
-        rule = CustomerRiskRule()
+        rule = HighRiskCustomerRule()
         triggered = rule.evaluate(transaction)
 
         assert triggered is True

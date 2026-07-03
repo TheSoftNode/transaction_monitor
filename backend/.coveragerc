@@ -1,0 +1,14 @@
+[run]
+omit =
+    */migrations/*
+    */tests/*
+    event_processor/main.py
+    event_processor/config.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    @abstractmethod
