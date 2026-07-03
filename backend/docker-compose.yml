@@ -60,6 +60,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        BUILD_ENV: development
     container_name: transaction-monitor-backend
     depends_on:
       postgres:
@@ -100,6 +102,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        BUILD_ENV: development
     container_name: transaction-monitor-event-processor
     depends_on:
       backend:

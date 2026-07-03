@@ -2,6 +2,8 @@ FROM python:3.12-slim as builder
 
 WORKDIR /app
 
+ARG BUILD_ENV=production
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
@@ -10,10 +12,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements/base.txt requirements/production.txt /app/requirements/
+COPY requirements/ /app/requirements/
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements/production.txt
+    if [ "$BUILD_ENV" = "development" ]; then \
+        pip install --no-cache-dir -r requirements/development.txt; \
+    else \
+        pip install --no-cache-dir -r requirements/production.txt; \
+    fi
 
 FROM python:3.12-slim
 
