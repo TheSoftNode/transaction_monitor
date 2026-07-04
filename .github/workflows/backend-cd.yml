@@ -36,7 +36,7 @@ jobs:
           # Build and deploy backend services
           echo "🐳 Building Docker images..."
           cd ~/transaction_monitor/backend
-          docker compose -f docker-compose.prod.yml build --no-cache
+          docker compose -f docker-compose.prod.yml build backend event-processor
 
           # Restart services with zero-downtime
           echo "♻️ Restarting services..."
