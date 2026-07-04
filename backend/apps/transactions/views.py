@@ -61,17 +61,18 @@ class TransactionViewSet(viewsets.ModelViewSet):
                 ).aggregate(total=models.Sum('amount'))['total'] or 0)
             })
 
+            # Always save ML results (even for untrained model)
+            if transaction.metadata is None:
+                transaction.metadata = {}
+            transaction.metadata['ml_prediction'] = ml_result
+            transaction.save(update_fields=['metadata'])
+
             if ml_result.get('is_anomaly'):
                 ml_anomaly_counter.inc()
                 logger.warning(
                     f"ML anomaly detected for {transaction.transaction_reference}: "
                     f"score={ml_result.get('anomaly_score'):.2f}"
                 )
-
-                if transaction.metadata is None:
-                    transaction.metadata = {}
-                transaction.metadata['ml_anomaly'] = ml_result
-                transaction.save(update_fields=['metadata'])
         except Exception as e:
             logger.error(f"ML prediction failed: {str(e)}", exc_info=True)
 
