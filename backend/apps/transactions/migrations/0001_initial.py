@@ -11,30 +11,117 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('customers', '0001_initial'),
+        ("customers", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Transaction',
+            name="Transaction",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('transaction_reference', models.CharField(db_index=True, max_length=100, unique=True)),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=15, validators=[django.core.validators.MinValueValidator(0)])),
-                ('currency', models.CharField(db_index=True, default='USD', max_length=3)),
-                ('transaction_type', models.CharField(choices=[('deposit', 'Deposit'), ('withdrawal', 'Withdrawal'), ('transfer', 'Transfer')], db_index=True, max_length=20)),
-                ('status', models.CharField(choices=[('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected'), ('under_review', 'Under Review')], db_index=True, default='pending', max_length=20)),
-                ('risk_score', models.IntegerField(db_index=True, default=0, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(100)])),
-                ('metadata', models.JSONField(blank=True, default=dict)),
-                ('created_at', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('processed_at', models.DateTimeField(blank=True, null=True)),
-                ('customer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='transactions', to='customers.customer')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "transaction_reference",
+                    models.CharField(db_index=True, max_length=100, unique=True),
+                ),
+                (
+                    "amount",
+                    models.DecimalField(
+                        decimal_places=2,
+                        max_digits=15,
+                        validators=[django.core.validators.MinValueValidator(0)],
+                    ),
+                ),
+                (
+                    "currency",
+                    models.CharField(db_index=True, default="USD", max_length=3),
+                ),
+                (
+                    "transaction_type",
+                    models.CharField(
+                        choices=[
+                            ("deposit", "Deposit"),
+                            ("withdrawal", "Withdrawal"),
+                            ("transfer", "Transfer"),
+                        ],
+                        db_index=True,
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("approved", "Approved"),
+                            ("rejected", "Rejected"),
+                            ("under_review", "Under Review"),
+                        ],
+                        db_index=True,
+                        default="pending",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "risk_score",
+                    models.IntegerField(
+                        db_index=True,
+                        default=0,
+                        validators=[
+                            django.core.validators.MinValueValidator(0),
+                            django.core.validators.MaxValueValidator(100),
+                        ],
+                    ),
+                ),
+                ("metadata", models.JSONField(blank=True, default=dict)),
+                ("created_at", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("processed_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "customer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="transactions",
+                        to="customers.customer",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'transactions',
-                'ordering': ['-created_at'],
-                'indexes': [models.Index(fields=['transaction_reference'], name='transaction_transac_8228df_idx'), models.Index(fields=['customer', 'created_at'], name='transaction_custome_fb8ec8_idx'), models.Index(fields=['status', 'risk_score'], name='transaction_status_3891b2_idx'), models.Index(fields=['transaction_type', 'created_at'], name='transaction_transac_6dc4cd_idx'), models.Index(fields=['currency', 'amount'], name='transaction_currenc_340c44_idx'), models.Index(fields=['-created_at', 'status'], name='transaction_created_6450cb_idx')],
+                "db_table": "transactions",
+                "ordering": ["-created_at"],
+                "indexes": [
+                    models.Index(
+                        fields=["transaction_reference"],
+                        name="transaction_transac_8228df_idx",
+                    ),
+                    models.Index(
+                        fields=["customer", "created_at"],
+                        name="transaction_custome_fb8ec8_idx",
+                    ),
+                    models.Index(
+                        fields=["status", "risk_score"],
+                        name="transaction_status_3891b2_idx",
+                    ),
+                    models.Index(
+                        fields=["transaction_type", "created_at"],
+                        name="transaction_transac_6dc4cd_idx",
+                    ),
+                    models.Index(
+                        fields=["currency", "amount"],
+                        name="transaction_currenc_340c44_idx",
+                    ),
+                    models.Index(
+                        fields=["-created_at", "status"],
+                        name="transaction_created_6450cb_idx",
+                    ),
+                ],
             },
         ),
     ]

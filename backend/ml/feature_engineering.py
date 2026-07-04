@@ -6,8 +6,8 @@ from typing import Dict, Any
 class FeatureExtractor:
     """Extract and engineer features from raw transaction data"""
 
-    HIGH_RISK_COUNTRIES = {'IRN', 'PRK', 'SYR', 'SDN', 'CUB', 'VEN'}
-    MEDIUM_RISK_COUNTRIES = {'RUS', 'CHN', 'PAK', 'AFG'}
+    HIGH_RISK_COUNTRIES = {"IRN", "PRK", "SYR", "SDN", "CUB", "VEN"}
+    MEDIUM_RISK_COUNTRIES = {"RUS", "CHN", "PAK", "AFG"}
 
     @staticmethod
     def extract(transaction_data: Dict[str, Any]) -> np.ndarray:
@@ -15,8 +15,8 @@ class FeatureExtractor:
         Extract feature vector from transaction.
         Returns standardized numpy array.
         """
-        amount = float(transaction_data.get('amount', 0))
-        timestamp = transaction_data.get('timestamp')
+        amount = float(transaction_data.get("amount", 0))
+        timestamp = transaction_data.get("timestamp")
 
         if timestamp:
             if isinstance(timestamp, str):
@@ -39,34 +39,29 @@ class FeatureExtractor:
             is_weekend,
             is_night,
             FeatureExtractor._encode_transaction_type(
-                transaction_data.get('transaction_type', 'deposit')
+                transaction_data.get("transaction_type", "deposit")
             ),
             FeatureExtractor._encode_risk_level(
-                transaction_data.get('customer_risk_level', 'low')
+                transaction_data.get("customer_risk_level", "low")
             ),
-            1 if transaction_data.get('is_blacklisted', False) else 0,
+            1 if transaction_data.get("is_blacklisted", False) else 0,
             FeatureExtractor._get_country_risk_score(
-                transaction_data.get('country_code', 'USA')
+                transaction_data.get("country_code", "USA")
             ),
-            transaction_data.get('customer_transaction_count', 0),
-            float(transaction_data.get('customer_total_volume', 0)),
+            transaction_data.get("customer_transaction_count", 0),
+            float(transaction_data.get("customer_total_volume", 0)),
         ]
 
         return np.array(features, dtype=np.float32)
 
     @staticmethod
     def _encode_transaction_type(txn_type: str) -> int:
-        mapping = {
-            'deposit': 0,
-            'withdrawal': 1,
-            'transfer': 2,
-            'payment': 1
-        }
+        mapping = {"deposit": 0, "withdrawal": 1, "transfer": 2, "payment": 1}
         return mapping.get(txn_type.lower(), 0)
 
     @staticmethod
     def _encode_risk_level(risk_level: str) -> int:
-        mapping = {'low': 0, 'medium': 1, 'high': 2}
+        mapping = {"low": 0, "medium": 1, "high": 2}
         return mapping.get(risk_level.lower(), 0)
 
     @staticmethod
@@ -81,16 +76,16 @@ class FeatureExtractor:
     def get_feature_names() -> list:
         """Return feature names for interpretability"""
         return [
-            'amount',
-            'log_amount',
-            'hour',
-            'day_of_week',
-            'is_weekend',
-            'is_night',
-            'transaction_type',
-            'customer_risk_level',
-            'is_blacklisted',
-            'country_risk_score',
-            'customer_transaction_count',
-            'customer_total_volume'
+            "amount",
+            "log_amount",
+            "hour",
+            "day_of_week",
+            "is_weekend",
+            "is_night",
+            "transaction_type",
+            "customer_risk_level",
+            "is_blacklisted",
+            "country_risk_score",
+            "customer_transaction_count",
+            "customer_total_volume",
         ]

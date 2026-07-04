@@ -10,18 +10,18 @@ class HighValueTransactionRule(BaseRule):
 
     def __init__(self, config=None):
         super().__init__(config)
-        self.threshold = Decimal(self.config.get('threshold', 10000))
+        self.threshold = Decimal(self.config.get("threshold", 10000))
 
     def evaluate(self, transaction: Transaction) -> bool:
         return transaction.amount > self.threshold
 
     def get_severity(self) -> str:
-        if transaction_amount := getattr(self, '_current_transaction_amount', None):
+        if transaction_amount := getattr(self, "_current_transaction_amount", None):
             if transaction_amount > self.threshold * 5:
-                return 'critical'
+                return "critical"
             elif transaction_amount > self.threshold * 2:
-                return 'high'
-        return 'medium'
+                return "high"
+        return "medium"
 
     def get_message(self, transaction: Transaction) -> str:
         self._current_transaction_amount = transaction.amount

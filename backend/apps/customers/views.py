@@ -7,13 +7,17 @@ from .filters import CustomerFilter
 
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
     filterset_class = CustomerFilter
-    search_fields = ['customer_reference', 'full_name', 'email']
-    ordering_fields = ['created_at', 'full_name', 'risk_level']
-    ordering = ['-created_at']
+    search_fields = ["customer_reference", "full_name", "email"]
+    ordering_fields = ["created_at", "full_name", "risk_level"]
+    ordering = ["-created_at"]
 
     def get_serializer_class(self):
-        if self.action == 'list':
+        if self.action == "list":
             return CustomerListSerializer
         return CustomerSerializer

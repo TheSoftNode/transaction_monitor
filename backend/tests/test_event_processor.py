@@ -20,21 +20,21 @@ class TestEventProcessor:
         """Test handling transaction.created event"""
         # Create a transaction
         transaction = Transaction.objects.create(
-            transaction_reference='TXN_EVENT_TEST',
+            transaction_reference="TXN_EVENT_TEST",
             customer=customer,
-            amount=Decimal('15000.00'),
-            currency='USD',
-            transaction_type='withdrawal'
+            amount=Decimal("15000.00"),
+            currency="USD",
+            transaction_type="withdrawal",
         )
 
         # Prepare event data
         event_data = {
-            'transaction_id': str(transaction.id),
-            'transaction_reference': transaction.transaction_reference,
-            'customer_id': str(customer.id),
-            'amount': '15000.00',
-            'currency': 'USD',
-            'transaction_type': 'withdrawal'
+            "transaction_id": str(transaction.id),
+            "transaction_reference": transaction.transaction_reference,
+            "customer_id": str(customer.id),
+            "amount": "15000.00",
+            "currency": "USD",
+            "transaction_type": "withdrawal",
         }
 
         # Process the event
@@ -48,27 +48,27 @@ class TestEventProcessor:
     def test_handle_transaction_created_with_nonexistent_transaction(self):
         """Test handling event for non-existent transaction"""
         event_data = {
-            'transaction_id': '00000000-0000-0000-0000-000000000000',
+            "transaction_id": "00000000-0000-0000-0000-000000000000",
         }
 
         handler = TransactionEventHandler()
         with pytest.raises(Transaction.DoesNotExist):
             handler.handle_transaction_created(event_data)
 
-    @patch('event_processor.handlers.logger')
+    @patch("event_processor.handlers.logger")
     def test_event_handler_logging(self, mock_logger, customer):
         """Test that event processing logs correctly"""
         transaction = Transaction.objects.create(
-            transaction_reference='TXN_LOG_TEST',
+            transaction_reference="TXN_LOG_TEST",
             customer=customer,
-            amount=Decimal('5000.00'),
-            currency='USD',
-            transaction_type='deposit'
+            amount=Decimal("5000.00"),
+            currency="USD",
+            transaction_type="deposit",
         )
 
         event_data = {
-            'transaction_id': str(transaction.id),
-            'transaction_reference': transaction.transaction_reference,
+            "transaction_id": str(transaction.id),
+            "transaction_reference": transaction.transaction_reference,
         }
 
         handler = TransactionEventHandler()

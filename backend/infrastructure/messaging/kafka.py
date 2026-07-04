@@ -13,10 +13,10 @@ class KafkaMessagePublisher(BaseMessagePublisher):
     def __init__(self):
         self.producer = KafkaProducer(
             bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
-            value_serializer=lambda v: json.dumps(v).encode('utf-8'),
-            acks='all',
+            value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+            acks="all",
             retries=3,
-            max_in_flight_requests_per_connection=1
+            max_in_flight_requests_per_connection=1,
         )
 
     def publish(self, topic: str, message: Dict[str, Any]) -> bool:
@@ -51,10 +51,10 @@ class KafkaMessageConsumer(BaseMessageConsumer):
             self.consumer = KafkaConsumer(
                 bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
                 group_id=self.group_id,
-                value_deserializer=lambda m: json.loads(m.decode('utf-8')),
-                auto_offset_reset='earliest',
+                value_deserializer=lambda m: json.loads(m.decode("utf-8")),
+                auto_offset_reset="earliest",
                 enable_auto_commit=True,
-                auto_commit_interval_ms=1000
+                auto_commit_interval_ms=1000,
             )
         self.consumer.subscribe(list(self.callbacks.keys()))
 
@@ -85,7 +85,7 @@ class KafkaMessageConsumer(BaseMessageConsumer):
                     except Exception as e:
                         logger.error(
                             f"Error processing message from {topic}: {str(e)}",
-                            exc_info=True
+                            exc_info=True,
                         )
         except Exception as e:
             logger.error(f"Consumer error: {str(e)}", exc_info=True)

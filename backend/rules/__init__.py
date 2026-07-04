@@ -1,1 +1,1 @@
-default_app_config = 'rules.apps.RulesConfig'
+default_app_config = "rules.apps.RulesConfig"

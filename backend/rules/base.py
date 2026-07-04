@@ -12,7 +12,7 @@ class BaseRule(ABC):
         self.description = self.__doc__ or "No description provided"
 
     @abstractmethod
-    def evaluate(self, transaction: 'Transaction') -> bool:
+    def evaluate(self, transaction: "Transaction") -> bool:
         """
         Evaluate the rule against a transaction.
         Returns True if the rule is triggered, False otherwise.
@@ -27,7 +27,7 @@ class BaseRule(ABC):
         pass
 
     @abstractmethod
-    def get_message(self, transaction: 'Transaction') -> str:
+    def get_message(self, transaction: "Transaction") -> str:
         """
         Generate a descriptive message about why the rule was triggered.
         """
@@ -38,9 +38,9 @@ class BaseRule(ABC):
         Return the risk score impact (0-100) when this rule is triggered.
         """
         severity_scores = {
-            'low': 10,
-            'medium': 25,
-            'high': 50,
-            'critical': 75,
+            "low": 10,
+            "medium": 25,
+            "high": 50,
+            "critical": 75,
         }
         return severity_scores.get(self.get_severity(), 10)

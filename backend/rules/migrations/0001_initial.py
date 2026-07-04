@@ -7,26 +7,41 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='RuleConfiguration',
+            name="RuleConfiguration",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('rule_name', models.CharField(db_index=True, max_length=255, unique=True)),
-                ('is_active', models.BooleanField(db_index=True, default=True)),
-                ('priority', models.IntegerField(db_index=True, default=0)),
-                ('parameters', models.JSONField(default=dict)),
-                ('description', models.TextField(blank=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "rule_name",
+                    models.CharField(db_index=True, max_length=255, unique=True),
+                ),
+                ("is_active", models.BooleanField(db_index=True, default=True)),
+                ("priority", models.IntegerField(db_index=True, default=0)),
+                ("parameters", models.JSONField(default=dict)),
+                ("description", models.TextField(blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'db_table': 'rule_configurations',
-                'ordering': ['-priority', 'rule_name'],
-                'indexes': [models.Index(fields=['is_active', 'priority'], name='rule_config_is_acti_a1201e_idx')],
+                "db_table": "rule_configurations",
+                "ordering": ["-priority", "rule_name"],
+                "indexes": [
+                    models.Index(
+                        fields=["is_active", "priority"],
+                        name="rule_config_is_acti_a1201e_idx",
+                    )
+                ],
             },
         ),
     ]

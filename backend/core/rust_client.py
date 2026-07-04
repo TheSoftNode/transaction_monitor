@@ -11,16 +11,10 @@ class RustRiskScorerClient:
 
     def __init__(self):
         self.base_url = getattr(
-            settings,
-            'RUST_RISK_SCORER_URL',
-            'http://localhost:8001'
+            settings, "RUST_RISK_SCORER_URL", "http://localhost:8001"
         )
         self.timeout = 5
-        self.enabled = getattr(
-            settings,
-            'RUST_RISK_SCORER_ENABLED',
-            False
-        )
+        self.enabled = getattr(settings, "RUST_RISK_SCORER_ENABLED", False)
 
     def is_available(self) -> bool:
         """Check if Rust service is available"""
@@ -28,15 +22,14 @@ class RustRiskScorerClient:
             return False
 
         try:
-            response = requests.get(
-                f"{self.base_url}/health",
-                timeout=2
-            )
+            response = requests.get(f"{self.base_url}/health", timeout=2)
             return response.status_code == 200
         except Exception:
             return False
 
-    def calculate_risk_score(self, transaction_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    def calculate_risk_score(
+        self, transaction_data: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
         """
         Calculate risk score using Rust microservice.
 
@@ -48,20 +41,20 @@ class RustRiskScorerClient:
 
         try:
             payload = {
-                'transaction_id': str(transaction_data.get('id', '')),
-                'customer_id': str(transaction_data.get('customer_id', '')),
-                'amount': float(transaction_data.get('amount', 0)),
-                'currency': transaction_data.get('currency', 'USD'),
-                'transaction_type': transaction_data.get('transaction_type', ''),
-                'country_code': transaction_data.get('country_code', 'USA'),
-                'customer_risk_level': transaction_data.get('customer_risk_level', 'low'),
-                'is_blacklisted': transaction_data.get('is_blacklisted', False),
+                "transaction_id": str(transaction_data.get("id", "")),
+                "customer_id": str(transaction_data.get("customer_id", "")),
+                "amount": float(transaction_data.get("amount", 0)),
+                "currency": transaction_data.get("currency", "USD"),
+                "transaction_type": transaction_data.get("transaction_type", ""),
+                "country_code": transaction_data.get("country_code", "USA"),
+                "customer_risk_level": transaction_data.get(
+                    "customer_risk_level", "low"
+                ),
+                "is_blacklisted": transaction_data.get("is_blacklisted", False),
             }
 
             response = requests.post(
-                f"{self.base_url}/api/score",
-                json=payload,
-                timeout=self.timeout
+                f"{self.base_url}/api/score", json=payload, timeout=self.timeout
             )
 
             if response.status_code == 200:
@@ -72,9 +65,7 @@ class RustRiskScorerClient:
                 )
                 return result
             else:
-                logger.warning(
-                    f"Rust scorer returned status {response.status_code}"
-                )
+                logger.warning(f"Rust scorer returned status {response.status_code}")
                 return None
 
         except requests.Timeout:

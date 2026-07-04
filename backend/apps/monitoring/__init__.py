@@ -1,1 +1,1 @@
-default_app_config = 'apps.monitoring.apps.MonitoringConfig'
+default_app_config = "apps.monitoring.apps.MonitoringConfig"

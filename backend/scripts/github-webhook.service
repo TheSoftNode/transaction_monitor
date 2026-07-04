@@ -1,0 +1,19 @@
+[Unit]
+Description=GitHub Webhook Listener for Auto-Deployment
+After=network.target
+
+[Service]
+Type=simple
+User=uripg
+WorkingDirectory=/home/uripg/transaction_monitor
+Environment="WEBHOOK_SECRET=your-secret-here-change-this"
+ExecStart=/usr/bin/python3 /home/uripg/transaction_monitor/backend/scripts/webhook-listener.py
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=append:/var/log/github-webhook.log
+StandardError=append:/var/log/github-webhook.log
+
+[Install]
+WantedBy=multi-user.target

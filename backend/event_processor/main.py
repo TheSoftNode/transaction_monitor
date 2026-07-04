@@ -8,8 +8,7 @@ from .handlers import TransactionEventHandler
 from .config import *  # noqa - Initialize Django
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 logger = logging.getLogger(__name__)
@@ -17,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class EventProcessor:
     def __init__(self):
-        self.consumer = KafkaMessageConsumer(group_id='transaction-monitor-processors')
+        self.consumer = KafkaMessageConsumer(group_id="transaction-monitor-processors")
         self.transaction_handler = TransactionEventHandler()
         self.running = False
 
@@ -33,8 +32,8 @@ class EventProcessor:
         logger.info("Starting Event Processor...")
 
         self.consumer.subscribe(
-            settings.KAFKA_TOPICS['TRANSACTION_CREATED'],
-            self.transaction_handler.handle_transaction_created
+            settings.KAFKA_TOPICS["TRANSACTION_CREATED"],
+            self.transaction_handler.handle_transaction_created,
         )
 
         self.running = True
@@ -56,6 +55,6 @@ class EventProcessor:
             self.consumer.stop()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     processor = EventProcessor()
     processor.start()

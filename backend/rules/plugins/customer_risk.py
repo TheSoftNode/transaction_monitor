@@ -9,15 +9,15 @@ class HighRiskCustomerRule(BaseRule):
 
     def evaluate(self, transaction: Transaction) -> bool:
         return (
-            transaction.customer.risk_level == 'high' or
-            transaction.customer.is_blacklisted
+            transaction.customer.risk_level == "high"
+            or transaction.customer.is_blacklisted
         )
 
     def get_severity(self) -> str:
-        if transaction_customer := getattr(self, '_current_customer', None):
+        if transaction_customer := getattr(self, "_current_customer", None):
             if transaction_customer.is_blacklisted:
-                return 'critical'
-        return 'high'
+                return "critical"
+        return "high"
 
     def get_message(self, transaction: Transaction) -> str:
         self._current_customer = transaction.customer

@@ -32,14 +32,17 @@ class ModelMetrics:
 
     def to_dict(self) -> Dict[str, Any]:
         return {
-            'total_predictions': self.predictions_count,
-            'anomalies_detected': self.anomalies_detected,
-            'anomaly_rate': (
+            "total_predictions": self.predictions_count,
+            "anomalies_detected": self.anomalies_detected,
+            "anomaly_rate": (
                 self.anomalies_detected / self.predictions_count
-                if self.predictions_count > 0 else 0
+                if self.predictions_count > 0
+                else 0
             ),
-            'avg_anomaly_score': round(self.avg_score, 4),
-            'last_trained': self.last_trained.isoformat() if self.last_trained else None
+            "avg_anomaly_score": round(self.avg_score, 4),
+            "last_trained": (
+                self.last_trained.isoformat() if self.last_trained else None
+            ),
         }
 
 
@@ -51,19 +54,19 @@ class TransactionAnomalyDetector:
     and comprehensive monitoring.
     """
 
-    MODEL_VERSION = '1.0.0'
+    MODEL_VERSION = "1.0.0"
     MIN_TRAINING_SAMPLES = 100
 
     def __init__(
         self,
         model_dir: Optional[str] = None,
         contamination: float = 0.05,
-        n_estimators: int = 150
+        n_estimators: int = 150,
     ):
-        self.model_dir = model_dir or os.path.join(settings.BASE_DIR, 'ml', 'models')
-        self.model_path = os.path.join(self.model_dir, 'anomaly_detector.pkl')
-        self.scaler_path = os.path.join(self.model_dir, 'scaler.pkl')
-        self.metadata_path = os.path.join(self.model_dir, 'metadata.pkl')
+        self.model_dir = model_dir or os.path.join(settings.BASE_DIR, "ml", "models")
+        self.model_path = os.path.join(self.model_dir, "anomaly_detector.pkl")
+        self.scaler_path = os.path.join(self.model_dir, "scaler.pkl")
+        self.metadata_path = os.path.join(self.model_dir, "metadata.pkl")
 
         self.contamination = contamination
         self.n_estimators = n_estimators
@@ -84,20 +87,17 @@ class TransactionAnomalyDetector:
 
     def _model_exists(self) -> bool:
         """Check if trained model files exist"""
-        return (
-            os.path.exists(self.model_path) and
-            os.path.exists(self.scaler_path)
-        )
+        return os.path.exists(self.model_path) and os.path.exists(self.scaler_path)
 
     def _create_new_model(self):
         """Create new untrained model"""
         self.model = IsolationForest(
             contamination=self.contamination,
             n_estimators=self.n_estimators,
-            max_samples='auto',
+            max_samples="auto",
             random_state=42,
             n_jobs=-1,
-            warm_start=False
+            warm_start=False,
         )
         self.scaler = RobustScaler()
         logger.info(
@@ -113,7 +113,7 @@ class TransactionAnomalyDetector:
 
             if os.path.exists(self.metadata_path):
                 metadata = joblib.load(self.metadata_path)
-                self.metrics.last_trained = metadata.get('trained_at')
+                self.metrics.last_trained = metadata.get("trained_at")
 
             self.is_trained = True
             logger.info(f"Loaded pre-trained model (v{self.MODEL_VERSION})")
@@ -122,9 +122,7 @@ class TransactionAnomalyDetector:
             self._create_new_model()
 
     def train(
-        self,
-        transactions: List[Dict[str, Any]],
-        validation_split: float = 0.2
+        self, transactions: List[Dict[str, Any]], validation_split: float = 0.2
     ) -> Dict[str, Any]:
         """
         Train model on historical transactions.
@@ -140,7 +138,7 @@ class TransactionAnomalyDetector:
             logger.warning(
                 f"Insufficient training data: {len(transactions)} < {self.MIN_TRAINING_SAMPLES}"
             )
-            return {'success': False, 'error': 'Insufficient training data'}
+            return {"success": False, "error": "Insufficient training data"}
 
         try:
             X = self._prepare_features(transactions)
@@ -164,15 +162,15 @@ class TransactionAnomalyDetector:
             self.metrics.last_trained = datetime.utcnow()
 
             training_stats = {
-                'success': True,
-                'samples_trained': len(X_train),
-                'samples_validated': len(X_val),
-                'train_score_mean': float(np.mean(train_scores)),
-                'train_score_std': float(np.std(train_scores)),
-                'val_score_mean': float(np.mean(val_scores)),
-                'val_score_std': float(np.std(val_scores)),
-                'model_version': self.MODEL_VERSION,
-                'trained_at': self.metrics.last_trained.isoformat()
+                "success": True,
+                "samples_trained": len(X_train),
+                "samples_validated": len(X_val),
+                "train_score_mean": float(np.mean(train_scores)),
+                "train_score_std": float(np.std(train_scores)),
+                "val_score_mean": float(np.mean(val_scores)),
+                "val_score_std": float(np.std(val_scores)),
+                "model_version": self.MODEL_VERSION,
+                "trained_at": self.metrics.last_trained.isoformat(),
             }
 
             logger.info(
@@ -182,14 +180,11 @@ class TransactionAnomalyDetector:
 
         except Exception as e:
             logger.error(f"Training failed: {str(e)}", exc_info=True)
-            return {'success': False, 'error': str(e)}
+            return {"success": False, "error": str(e)}
 
     def _prepare_features(self, transactions: List[Dict[str, Any]]) -> np.ndarray:
         """Extract and stack features from transactions"""
-        features = [
-            self.feature_extractor.extract(txn)
-            for txn in transactions
-        ]
+        features = [self.feature_extractor.extract(txn) for txn in transactions]
         return np.vstack(features)
 
     def _save_model(self):
@@ -200,11 +195,11 @@ class TransactionAnomalyDetector:
         joblib.dump(self.scaler, self.scaler_path)
 
         metadata = {
-            'version': self.MODEL_VERSION,
-            'trained_at': datetime.utcnow(),
-            'contamination': self.contamination,
-            'n_estimators': self.n_estimators,
-            'feature_names': self.feature_extractor.get_feature_names()
+            "version": self.MODEL_VERSION,
+            "trained_at": datetime.utcnow(),
+            "contamination": self.contamination,
+            "n_estimators": self.n_estimators,
+            "feature_names": self.feature_extractor.get_feature_names(),
         }
         joblib.dump(metadata, self.metadata_path)
 
@@ -222,10 +217,10 @@ class TransactionAnomalyDetector:
         """
         if not self.is_trained:
             return {
-                'is_anomaly': False,
-                'anomaly_score': 0.0,
-                'confidence': 0.0,
-                'warning': 'Model not trained'
+                "is_anomaly": False,
+                "anomaly_score": 0.0,
+                "confidence": 0.0,
+                "warning": "Model not trained",
             }
 
         try:
@@ -241,10 +236,10 @@ class TransactionAnomalyDetector:
             self.metrics.update(is_anomaly, normalized_score)
 
             result = {
-                'is_anomaly': bool(is_anomaly),
-                'anomaly_score': float(normalized_score),
-                'confidence': float(abs(score)),
-                'model_version': self.MODEL_VERSION
+                "is_anomaly": bool(is_anomaly),
+                "anomaly_score": float(normalized_score),
+                "confidence": float(abs(score)),
+                "model_version": self.MODEL_VERSION,
             }
 
             if is_anomaly:
@@ -258,10 +253,10 @@ class TransactionAnomalyDetector:
         except Exception as e:
             logger.error(f"Prediction error: {str(e)}", exc_info=True)
             return {
-                'is_anomaly': False,
-                'anomaly_score': 0.0,
-                'confidence': 0.0,
-                'error': str(e)
+                "is_anomaly": False,
+                "anomaly_score": 0.0,
+                "confidence": 0.0,
+                "error": str(e),
             }
 
     def _normalize_score(self, raw_score: float) -> float:
@@ -287,12 +282,14 @@ class TransactionAnomalyDetector:
 
                 self.metrics.update(is_anomaly, normalized_score)
 
-                results.append({
-                    'is_anomaly': bool(is_anomaly),
-                    'anomaly_score': float(normalized_score),
-                    'confidence': float(abs(score)),
-                    'model_version': self.MODEL_VERSION
-                })
+                results.append(
+                    {
+                        "is_anomaly": bool(is_anomaly),
+                        "anomaly_score": float(normalized_score),
+                        "confidence": float(abs(score)),
+                        "model_version": self.MODEL_VERSION,
+                    }
+                )
 
             return results
 

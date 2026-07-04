@@ -11,10 +11,10 @@ class RuleConfiguration(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'rule_configurations'
-        ordering = ['-priority', 'rule_name']
+        db_table = "rule_configurations"
+        ordering = ["-priority", "rule_name"]
         indexes = [
-            models.Index(fields=['is_active', 'priority']),
+            models.Index(fields=["is_active", "priority"]),
         ]
 
     def __str__(self):

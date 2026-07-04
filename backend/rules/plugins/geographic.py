@@ -9,15 +9,15 @@ class BlacklistedCountryRule(BaseRule):
 
     def __init__(self, config=None):
         super().__init__(config)
-        self.blacklisted_countries = self.config.get('blacklisted_countries', [
-            'KP', 'IR', 'SY', 'CU', 'VE'
-        ])
+        self.blacklisted_countries = self.config.get(
+            "blacklisted_countries", ["KP", "IR", "SY", "CU", "VE"]
+        )
 
     def evaluate(self, transaction: Transaction) -> bool:
         return transaction.customer.country_code.upper() in self.blacklisted_countries
 
     def get_severity(self) -> str:
-        return 'critical'
+        return "critical"
 
     def get_message(self, transaction: Transaction) -> str:
         return (

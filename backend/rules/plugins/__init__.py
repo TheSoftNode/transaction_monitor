@@ -4,8 +4,8 @@ from .geographic import BlacklistedCountryRule
 from .customer_risk import HighRiskCustomerRule
 
 __all__ = [
-    'HighValueTransactionRule',
-    'VelocityRule',
-    'BlacklistedCountryRule',
-    'HighRiskCustomerRule',
+    "HighValueTransactionRule",
+    "VelocityRule",
+    "BlacklistedCountryRule",
+    "HighRiskCustomerRule",
 ]

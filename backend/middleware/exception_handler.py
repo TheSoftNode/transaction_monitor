@@ -14,6 +14,6 @@ class ExceptionHandlerMiddleware:
         logger.error(
             f"Unhandled exception: {exception}",
             exc_info=True,
-            extra={'request_id': getattr(request, 'id', None)}
+            extra={"request_id": getattr(request, "id", None)},
         )
         return None

@@ -6,7 +6,7 @@ class RequestIDMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        request.id = request.headers.get('X-Request-ID', str(uuid.uuid4()))
+        request.id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
         response = self.get_response(request)
-        response['X-Request-ID'] = request.id
+        response["X-Request-ID"] = request.id
         return response

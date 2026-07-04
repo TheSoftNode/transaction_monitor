@@ -6,11 +6,19 @@ class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = [
-            'id', 'customer_reference', 'full_name', 'email', 'phone',
-            'country_code', 'risk_level', 'is_blacklisted', 'metadata',
-            'created_at', 'updated_at'
+            "id",
+            "customer_reference",
+            "full_name",
+            "email",
+            "phone",
+            "country_code",
+            "risk_level",
+            "is_blacklisted",
+            "metadata",
+            "created_at",
+            "updated_at",
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ["id", "created_at", "updated_at"]
 
     def validate_customer_reference(self, value):
         if self.instance is None:
@@ -29,7 +37,13 @@ class CustomerListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = [
-            'id', 'customer_reference', 'full_name', 'email',
-            'country_code', 'risk_level', 'is_blacklisted', 'created_at'
+            "id",
+            "customer_reference",
+            "full_name",
+            "email",
+            "country_code",
+            "risk_level",
+            "is_blacklisted",
+            "created_at",
         ]
-        read_only_fields = ['id', 'created_at']
+        read_only_fields = ["id", "created_at"]

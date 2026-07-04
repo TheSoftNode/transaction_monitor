@@ -8,29 +8,67 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Customer',
+            name="Customer",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('customer_reference', models.CharField(db_index=True, max_length=100, unique=True)),
-                ('full_name', models.CharField(max_length=255)),
-                ('email', models.EmailField(db_index=True, max_length=254, unique=True)),
-                ('phone', models.CharField(blank=True, max_length=20, null=True)),
-                ('country_code', models.CharField(db_index=True, max_length=3)),
-                ('risk_level', models.CharField(choices=[('low', 'Low'), ('medium', 'Medium'), ('high', 'High')], db_index=True, default='low', max_length=10)),
-                ('is_blacklisted', models.BooleanField(db_index=True, default=False)),
-                ('metadata', models.JSONField(blank=True, default=dict)),
-                ('created_at', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "customer_reference",
+                    models.CharField(db_index=True, max_length=100, unique=True),
+                ),
+                ("full_name", models.CharField(max_length=255)),
+                (
+                    "email",
+                    models.EmailField(db_index=True, max_length=254, unique=True),
+                ),
+                ("phone", models.CharField(blank=True, max_length=20, null=True)),
+                ("country_code", models.CharField(db_index=True, max_length=3)),
+                (
+                    "risk_level",
+                    models.CharField(
+                        choices=[
+                            ("low", "Low"),
+                            ("medium", "Medium"),
+                            ("high", "High"),
+                        ],
+                        db_index=True,
+                        default="low",
+                        max_length=10,
+                    ),
+                ),
+                ("is_blacklisted", models.BooleanField(db_index=True, default=False)),
+                ("metadata", models.JSONField(blank=True, default=dict)),
+                ("created_at", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'db_table': 'customers',
-                'ordering': ['-created_at'],
-                'indexes': [models.Index(fields=['customer_reference', 'email'], name='customers_custome_41b4f9_idx'), models.Index(fields=['country_code', 'risk_level'], name='customers_country_b2795c_idx'), models.Index(fields=['is_blacklisted', 'created_at'], name='customers_is_blac_df3dbf_idx')],
+                "db_table": "customers",
+                "ordering": ["-created_at"],
+                "indexes": [
+                    models.Index(
+                        fields=["customer_reference", "email"],
+                        name="customers_custome_41b4f9_idx",
+                    ),
+                    models.Index(
+                        fields=["country_code", "risk_level"],
+                        name="customers_country_b2795c_idx",
+                    ),
+                    models.Index(
+                        fields=["is_blacklisted", "created_at"],
+                        name="customers_is_blac_df3dbf_idx",
+                    ),
+                ],
             },
         ),
     ]

@@ -19,13 +19,15 @@ class TransactionEventHandler:
         - Update risk score
         - Create alerts if needed
         """
-        transaction_id = event_data.get('transaction_id')
+        transaction_id = event_data.get("transaction_id")
         if not transaction_id:
             logger.error("No transaction_id in event data")
             return
 
         try:
-            transaction = Transaction.objects.select_related('customer').get(id=transaction_id)
+            transaction = Transaction.objects.select_related("customer").get(
+                id=transaction_id
+            )
 
             logger.info(f"Processing transaction: {transaction.transaction_reference}")
 
@@ -37,16 +39,16 @@ class TransactionEventHandler:
                 f"Alerts Created: {result['rules_count']}"
             )
 
-            if result['rules_count'] > 0:
+            if result["rules_count"] > 0:
                 transaction.processed_at = timezone.now()
-                transaction.save(update_fields=['processed_at'])
+                transaction.save(update_fields=["processed_at"])
 
         except Transaction.DoesNotExist:
             logger.error(f"Transaction not found: {transaction_id}")
         except Exception as e:
             logger.error(
                 f"Error processing transaction {transaction_id}: {str(e)}",
-                exc_info=True
+                exc_info=True,
             )
 
     def reload_rules(self):
