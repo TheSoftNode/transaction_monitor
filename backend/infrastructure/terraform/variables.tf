@@ -1,121 +1,152 @@
-variable "aws_region" {
-  description = "AWS region"
-  type        = string
-  default     = "us-east-1"
-}
-
-variable "environment" {
-  description = "Environment name"
-  type        = string
-  validation {
-    condition     = contains(["development", "staging", "production"], var.environment)
-    error_message = "Environment must be development, staging, or production."
-  }
-}
-
 variable "project_name" {
-  description = "Project name"
+  description = "Project name used for resource naming"
   type        = string
   default     = "transaction-monitor"
 }
 
-# VPC Variables
-variable "vpc_cidr" {
-  description = "CIDR block for VPC"
+variable "environment" {
+  description = "Environment (dev, staging, production)"
   type        = string
-  default     = "10.0.0.0/16"
+  default     = "production"
+  validation {
+    condition     = contains(["dev", "staging", "production"], var.environment)
+    error_message = "Environment must be dev, staging, or production."
+  }
 }
 
-variable "availability_zones" {
-  description = "Availability zones"
+variable "azure_region" {
+  description = "Azure region for resources"
+  type        = string
+  default     = "East US"
+}
+
+variable "allowed_ips" {
+  description = "List of allowed IP addresses for secure access"
   type        = list(string)
-  default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  default     = ["0.0.0.0/0"] # Update with your actual IP ranges
 }
 
-variable "private_subnets" {
-  description = "Private subnet CIDR blocks"
+# Network Configuration
+variable "vnet_address_space" {
+  description = "Address space for Virtual Network"
   type        = list(string)
-  default     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  default     = ["10.0.0.0/16"]
 }
 
-variable "public_subnets" {
-  description = "Public subnet CIDR blocks"
-  type        = list(string)
-  default     = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+variable "subnet_prefixes" {
+  description = "Subnet address prefixes"
+  type = object({
+    aks_subnet      = string
+    db_subnet       = string
+    redis_subnet    = string
+    eventhub_subnet = string
+  })
+  default = {
+    aks_subnet      = "10.0.1.0/24"
+    db_subnet       = "10.0.2.0/24"
+    redis_subnet    = "10.0.3.0/24"
+    eventhub_subnet = "10.0.4.0/24"
+  }
 }
 
-# EKS Variables
-variable "eks_cluster_version" {
-  description = "EKS cluster version"
+# AKS Configuration
+variable "kubernetes_version" {
+  description = "Kubernetes version for AKS"
   type        = string
   default     = "1.28"
 }
 
-variable "eks_node_groups" {
-  description = "EKS node groups configuration"
+variable "aks_node_pools" {
+  description = "AKS node pool configurations"
   type = map(object({
-    desired_size   = number
-    min_size       = number
-    max_size       = number
-    instance_types = list(string)
+    vm_size             = string
+    node_count          = number
+    min_count           = number
+    max_count           = number
+    enable_auto_scaling = bool
+    availability_zones  = list(string)
   }))
   default = {
-    general = {
-      desired_size   = 3
-      min_size       = 2
-      max_size       = 10
-      instance_types = ["t3.large"]
+    system = {
+      vm_size             = "Standard_D2s_v3"
+      node_count          = 2
+      min_count           = 2
+      max_count           = 5
+      enable_auto_scaling = true
+      availability_zones  = ["1", "2", "3"]
+    }
+    user = {
+      vm_size             = "Standard_D4s_v3"
+      node_count          = 3
+      min_count           = 2
+      max_count           = 10
+      enable_auto_scaling = true
+      availability_zones  = ["1", "2", "3"]
     }
   }
 }
 
-# RDS Variables
-variable "rds_instance_class" {
-  description = "RDS instance class"
+# PostgreSQL Configuration
+variable "postgresql_sku" {
+  description = "SKU for Azure PostgreSQL"
   type        = string
-  default     = "db.t3.medium"
+  default     = "GP_Standard_D2s_v3" # General Purpose, 2 vCores
 }
 
-variable "rds_allocated_storage" {
-  description = "RDS allocated storage in GB"
+variable "postgresql_storage_mb" {
+  description = "Storage size for PostgreSQL in MB"
   type        = number
-  default     = 100
+  default     = 32768 # 32GB
 }
 
 variable "database_name" {
-  description = "Database name"
+  description = "PostgreSQL database name"
   type        = string
   default     = "transaction_monitor"
 }
 
 variable "database_username" {
-  description = "Database master username"
+  description = "PostgreSQL admin username"
   type        = string
-  default     = "transaction_user"
+  default     = "pgadmin"
+  sensitive   = true
 }
 
-# Redis Variables
-variable "redis_node_type" {
-  description = "Redis node type"
+# Redis Configuration
+variable "redis_sku" {
+  description = "Redis SKU (Basic, Standard, Premium)"
   type        = string
-  default     = "cache.t3.medium"
+  default     = "Standard"
 }
 
-variable "redis_num_nodes" {
-  description = "Number of Redis cache nodes"
+variable "redis_family" {
+  description = "Redis family (C = Basic/Standard, P = Premium)"
+  type        = string
+  default     = "C"
+}
+
+variable "redis_capacity" {
+  description = "Redis cache size (0-6 for Standard)"
+  type        = number
+  default     = 1 # 1GB
+}
+
+# Event Hubs Configuration (Kafka-compatible)
+variable "eventhub_sku" {
+  description = "Event Hubs SKU (Basic, Standard, Premium)"
+  type        = string
+  default     = "Standard"
+}
+
+variable "eventhub_capacity" {
+  description = "Event Hubs throughput units"
   type        = number
   default     = 2
 }
 
-# Kafka Variables
-variable "kafka_broker_count" {
-  description = "Number of Kafka broker nodes"
-  type        = number
-  default     = 3
-}
-
-variable "kafka_instance_type" {
-  description = "Kafka broker instance type"
-  type        = string
-  default     = "kafka.m5.large"
+# Tags
+variable "tags" {
+  description = "Additional tags for all resources"
+  type        = map(string)
+  default     = {}
 }

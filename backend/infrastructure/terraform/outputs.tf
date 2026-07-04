@@ -1,67 +1,59 @@
-output "vpc_id" {
-  description = "VPC ID"
-  value       = module.vpc.vpc_id
+# AKS Outputs
+output "aks_cluster_name" {
+  description = "AKS cluster name"
+  value       = module.aks.cluster_name
 }
 
-output "private_subnet_ids" {
-  description = "Private subnet IDs"
-  value       = module.vpc.private_subnet_ids
-}
-
-output "public_subnet_ids" {
-  description = "Public subnet IDs"
-  value       = module.vpc.public_subnet_ids
-}
-
-output "eks_cluster_id" {
-  description = "EKS cluster ID"
-  value       = module.eks.cluster_id
-}
-
-output "eks_cluster_endpoint" {
-  description = "EKS cluster endpoint"
-  value       = module.eks.cluster_endpoint
-}
-
-output "eks_cluster_security_group_id" {
-  description = "EKS cluster security group ID"
-  value       = module.eks.cluster_security_group_id
-}
-
-output "rds_endpoint" {
-  description = "RDS endpoint"
-  value       = module.rds.endpoint
+output "aks_kube_config" {
+  description = "Kubernetes config"
+  value       = module.aks.kube_config
   sensitive   = true
 }
 
-output "rds_port" {
-  description = "RDS port"
-  value       = module.rds.port
+# PostgreSQL Outputs
+output "postgresql_fqdn" {
+  description = "PostgreSQL server FQDN"
+  value       = module.postgresql.server_fqdn
 }
 
-output "redis_endpoint" {
-  description = "Redis endpoint"
-  value       = module.redis.endpoint
+# Redis Outputs
+output "redis_hostname" {
+  description = "Redis hostname"
+  value       = module.redis.hostname
 }
 
-output "redis_port" {
-  description = "Redis port"
-  value       = module.redis.port
-}
-
-output "kafka_bootstrap_brokers" {
-  description = "Kafka bootstrap brokers"
-  value       = module.kafka.bootstrap_brokers
+output "redis_primary_key" {
+  description = "Redis primary key"
+  value       = module.redis.primary_access_key
   sensitive   = true
 }
 
-output "kafka_zookeeper_connect" {
-  description = "Kafka Zookeeper connection string"
-  value       = module.kafka.zookeeper_connect
+# Event Hubs Outputs
+output "eventhub_namespace" {
+  description = "Event Hubs namespace"
+  value       = module.eventhub.namespace_name
+}
+
+output "eventhub_connection_string" {
+  description = "Event Hubs connection string"
+  value       = module.eventhub.primary_connection_string
   sensitive   = true
 }
 
-output "s3_backups_bucket" {
-  description = "S3 backups bucket name"
-  value       = aws_s3_bucket.backups.id
+# ACR Outputs
+output "acr_login_server" {
+  description = "Container Registry login server"
+  value       = azurerm_container_registry.main.login_server
+}
+
+# Key Vault Outputs
+output "key_vault_uri" {
+  description = "Key Vault URI"
+  value       = azurerm_key_vault.main.vault_uri
+}
+
+# Resource Group Output
+output "resource_group_name" {
+  description = "Resource group name"
+  value       = azurerm_resource_group.main.name
 }

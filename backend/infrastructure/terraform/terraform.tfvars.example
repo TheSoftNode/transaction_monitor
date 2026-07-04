@@ -1,33 +1,59 @@
-aws_region  = "us-east-1"
-environment = "production"
+# Project Configuration
+project_name = "transaction-monitor"
+environment  = "production"
+azure_region = "East US"
 
-# VPC Configuration
-vpc_cidr           = "10.0.0.0/16"
-availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
-private_subnets    = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-public_subnets     = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+# Network Configuration
+vnet_address_space = ["10.0.0.0/16"]
+subnet_prefixes = {
+  aks_subnet      = "10.0.1.0/24"
+  db_subnet       = "10.0.2.0/24"
+  redis_subnet    = "10.0.3.0/24"
+  eventhub_subnet = "10.0.4.0/24"
+}
 
-# EKS Configuration
-eks_cluster_version = "1.28"
-eks_node_groups = {
-  general = {
-    desired_size   = 3
-    min_size       = 2
-    max_size       = 10
-    instance_types = ["t3.large"]
+# Security - Update with your IP ranges
+allowed_ips = ["YOUR_PUBLIC_IP/32"]
+
+# AKS Configuration
+kubernetes_version = "1.28"
+aks_node_pools = {
+  system = {
+    vm_size             = "Standard_D2s_v3"
+    node_count          = 2
+    min_count           = 2
+    max_count           = 5
+    enable_auto_scaling = true
+    availability_zones  = ["1", "2", "3"]
+  }
+  user = {
+    vm_size             = "Standard_D4s_v3"
+    node_count          = 3
+    min_count           = 2
+    max_count           = 10
+    enable_auto_scaling = true
+    availability_zones  = ["1", "2", "3"]
   }
 }
 
-# RDS Configuration
-rds_instance_class    = "db.t3.medium"
-rds_allocated_storage = 100
+# PostgreSQL Configuration
+postgresql_sku        = "GP_Standard_D2s_v3"
+postgresql_storage_mb = 32768
 database_name         = "transaction_monitor"
-database_username     = "transaction_user"
+database_username     = "pgadmin"
 
 # Redis Configuration
-redis_node_type  = "cache.t3.medium"
-redis_num_nodes  = 2
+redis_sku      = "Standard"
+redis_family   = "C"
+redis_capacity = 1
 
-# Kafka Configuration
-kafka_broker_count   = 3
-kafka_instance_type  = "kafka.m5.large"
+# Event Hubs Configuration (Kafka-compatible)
+eventhub_sku      = "Standard"
+eventhub_capacity = 2
+
+# Additional Tags
+tags = {
+  Owner       = "DevOps Team"
+  CostCenter  = "Engineering"
+  Application = "Transaction Monitoring"
+}

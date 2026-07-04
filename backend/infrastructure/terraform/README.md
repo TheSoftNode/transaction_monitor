@@ -1,190 +1,171 @@
-# Terraform Infrastructure
+# Terraform Infrastructure for Azure
 
-## Overview
+Complete infrastructure as code for deploying Transaction Monitoring Platform on Microsoft Azure.
 
-This directory contains Terraform configuration for deploying the Transaction Monitor infrastructure on AWS.
+## What Gets Deployed
 
-## Architecture
+- **AKS** (Azure Kubernetes Service) - Managed Kubernetes with auto-scaling
+- **PostgreSQL** - Azure Database for PostgreSQL Flexible Server
+- **Redis** - Azure Cache for Redis
+- **Event Hubs** - Kafka-compatible event streaming
+- **Container Registry** - Private Docker image registry (ACR)
+- **Key Vault** - Secrets management
+- **Storage Account** - Backups and logs
+- **Application Insights** - Monitoring
+- **Virtual Network** - Secure networking
 
-- **VPC**: Multi-AZ VPC with public and private subnets
-- **EKS**: Managed Kubernetes cluster for application workloads
-- **RDS**: PostgreSQL database with Multi-AZ deployment
-- **ElastiCache**: Redis for caching and session management
-- **MSK**: Managed Kafka for event streaming
-- **S3**: Backup storage with versioning and encryption
+## Quick Start
 
-## Prerequisites
-
-1. **AWS CLI** configured with appropriate credentials
-2. **Terraform** >= 1.5.0
-3. **S3 bucket** for Terraform state (create manually first)
-4. **DynamoDB table** for state locking
-
-### Create State Backend
+### 1. Prerequisites
 
 ```bash
-# Create S3 bucket for state
-aws s3api create-bucket \
-  --bucket transaction-monitor-terraform-state \
-  --region us-east-1
+# Install Azure CLI
+brew install azure-cli
 
-# Enable versioning
-aws s3api put-bucket-versioning \
-  --bucket transaction-monitor-terraform-state \
-  --versioning-configuration Status=Enabled
+# Install Terraform
+brew install terraform
 
-# Create DynamoDB table for locking
-aws dynamodb create-table \
-  --table-name terraform-state-lock \
-  --attribute-definitions AttributeName=LockID,AttributeType=S \
-  --key-schema AttributeName=LockID,KeyType=HASH \
-  --billing-mode PAY_PER_REQUEST \
-  --region us-east-1
+# Login to Azure
+az login
+az account set --subscription "YOUR_SUBSCRIPTION_ID"
 ```
 
-## Usage
-
-### 1. Initialize Terraform
+### 2. Create State Storage
 
 ```bash
-terraform init
+az group create --name transaction-monitor-tfstate --location "East US"
+
+az storage account create \
+  --name txmonitorterraformstate \
+  --resource-group transaction-monitor-tfstate \
+  --location "East US" \
+  --sku Standard_LRS
+
+az storage container create \
+  --name tfstate \
+  --account-name txmonitorterraformstate
 ```
 
-### 2. Create tfvars File
+### 3. Configure
 
 ```bash
 cp terraform.tfvars.example terraform.tfvars
 # Edit terraform.tfvars with your values
 ```
 
-### 3. Plan Infrastructure
+### 4. Deploy
 
 ```bash
-terraform plan -var-file=terraform.tfvars
+terraform init
+terraform plan
+terraform apply
 ```
 
-### 4. Apply Infrastructure
+Takes ~15-20 minutes.
+
+### 5. Connect to AKS
 
 ```bash
-terraform apply -var-file=terraform.tfvars
+az aks get-credentials \
+  --resource-group transaction-monitor-production-rg \
+  --name transaction-monitor-production-aks
+
+kubectl get nodes
 ```
 
-### 5. Get Outputs
+## Configuration
+
+Key variables in `terraform.tfvars`:
+
+```hcl
+azure_region = "East US"
+allowed_ips  = ["YOUR_IP/32"]  # Update this!
+
+# Sizing
+aks_node_pools = {
+  system = {
+    vm_size    = "Standard_D2s_v3"
+    node_count = 2
+  }
+}
+
+postgresql_sku = "GP_Standard_D2s_v3"
+redis_sku      = "Standard"
+```
+
+## Outputs
+
+After deployment:
 
 ```bash
-terraform output
+terraform output aks_cluster_name
+terraform output postgresql_fqdn
+terraform output redis_hostname
+terraform output acr_login_server
+```
+
+## Scaling
+
+### Scale AKS Nodes
+
+```hcl
+# terraform.tfvars
+aks_node_pools = {
+  user = {
+    node_count = 5  # Increase
+    max_count  = 15
+  }
+}
+```
+
+Then: `terraform apply`
+
+### Scale Database
+
+```hcl
+postgresql_sku = "GP_Standard_D4s_v3"  # 4 vCores
+```
+
+## Costs
+
+**Production** (current config): ~$800-1200/month
+
+**Dev** (smaller VMs, single zones): ~$300-500/month
+
+## Security
+
+- All resources in private subnets
+- NSG rules restrict access
+- Key Vault for secrets
+- RBAC enabled on AKS
+- Network policies enforced
+
+## Cleanup
+
+```bash
+terraform destroy
 ```
 
 ## Modules
 
-### VPC Module
-Creates VPC with:
-- Public subnets (for NAT gateways, load balancers)
-- Private subnets (for application workloads)
-- NAT gateways for outbound internet access
-- Internet gateway for inbound access
+- `network/` - VNet, subnets, NSGs
+- `aks/` - Kubernetes cluster
+- `postgresql/` - Database
+- `redis/` - Cache
+- `eventhub/` - Event streaming
 
-### EKS Module
-Creates EKS cluster with:
-- Managed control plane
-- Auto-scaling node groups
-- IAM roles and policies
-- Security groups
+Note: Module implementations are complete in terraform/modules/ directory.
 
-### RDS Module
-Creates PostgreSQL database with:
-- Multi-AZ deployment (production)
-- Automated backups
-- Enhanced monitoring
-- Secrets Manager integration
+## Next Steps
 
-### Redis Module
-Creates ElastiCache cluster with:
-- Redis 7.x
-- Automatic failover
-- Parameter group customization
+After infrastructure is ready:
 
-### Kafka Module
-Creates MSK cluster with:
-- Kafka 3.5.x
-- Multiple broker nodes
-- Encryption at rest and in transit
-- CloudWatch logging
+1. Deploy Kubernetes manifests (see `../k8s/README.md`)
+2. Configure DNS records
+3. Set up monitoring alerts
+4. Configure backups
 
-## Environments
+## Support
 
-Create separate tfvars files for each environment:
-
-- `terraform.tfvars.development`
-- `terraform.tfvars.staging`
-- `terraform.tfvars.production`
-
-## Cost Optimization
-
-### Development Environment
-- Single NAT gateway
-- Smaller instance types
-- Single-AZ RDS
-- Reduced backup retention
-
-### Production Environment
-- Multi-AZ everything
-- Larger instance types
-- Extended backup retention
-- Enhanced monitoring
-
-## Security
-
-- All data encrypted at rest and in transit
-- Security groups follow least privilege
-- Secrets stored in AWS Secrets Manager
-- S3 buckets have public access blocked
-- KMS encryption for sensitive data
-
-## Outputs
-
-After applying, you'll get:
-- EKS cluster endpoint and kubeconfig
-- RDS endpoint and credentials (in Secrets Manager)
-- Redis endpoint
-- Kafka bootstrap servers
-
-## Configure kubectl
-
-```bash
-aws eks update-kubeconfig \
-  --region us-east-1 \
-  --name transaction-monitor-production
-```
-
-## Destroy Infrastructure
-
-```bash
-terraform destroy -var-file=terraform.tfvars
-```
-
-⚠️ **Warning**: This will delete all resources including databases. Ensure backups are taken first.
-
-## Troubleshooting
-
-### State Lock Issues
-```bash
-# Force unlock (use with caution)
-terraform force-unlock <LOCK_ID>
-```
-
-### EKS Access Issues
-```bash
-# Verify IAM user/role
-aws sts get-caller-identity
-
-# Update kubeconfig
-aws eks update-kubeconfig --name <cluster-name>
-```
-
-### RDS Connection Issues
-```bash
-# Get credentials from Secrets Manager
-aws secretsmanager get-secret-value \
-  --secret-id transaction-monitor-production-db-credentials
-```
+- Terraform docs: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs
+- Azure docs: https://docs.microsoft.com/en-us/azure/
