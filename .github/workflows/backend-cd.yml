@@ -1,0 +1,86 @@
+name: CD Pipeline - Azure VM Deployment
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - 'rust-risk-scorer/**'
+      - '.github/workflows/cd.yml'
+
+jobs:
+  deploy:
+    name: Deploy to Azure VM
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Deploy to Azure VM
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.AZURE_VM_HOST }}
+        username: ${{ secrets.AZURE_VM_USERNAME }}
+        key: ${{ secrets.AZURE_VM_SSH_KEY }}
+        script: |
+          echo "🚀 Starting deployment..."
+
+          # Navigate to project directory
+          cd ~/transaction_monitor
+
+          # Pull latest changes
+          echo "📥 Pulling latest code from GitHub..."
+          git pull origin main
+
+          # Build and deploy backend services
+          echo "🐳 Building Docker images..."
+          cd ~/transaction_monitor/backend
+          docker compose -f docker-compose.prod.yml build --no-cache
+
+          # Restart services with zero-downtime
+          echo "♻️ Restarting services..."
+          docker compose -f docker-compose.prod.yml up -d --force-recreate --no-deps backend event-processor
+
+          # Wait for services to be healthy
+          echo "⏳ Waiting for services to be healthy..."
+          sleep 30
+
+          # Check service health
+          echo "🏥 Checking service health..."
+          docker compose -f docker-compose.prod.yml ps
+
+          # Test health endpoint
+          echo "🧪 Testing health endpoint..."
+          curl -f http://localhost:8000/health/ || exit 1
+
+          echo "✅ Deployment successful!"
+
+    - name: Verify Deployment
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.AZURE_VM_HOST }}
+        username: ${{ secrets.AZURE_VM_USERNAME }}
+        key: ${{ secrets.AZURE_VM_SSH_KEY }}
+        script: |
+          echo "🔍 Verifying deployment..."
+
+          # Check all services status
+          cd ~/transaction_monitor/backend
+          docker compose -f docker-compose.prod.yml ps
+
+          # Check logs for errors
+          echo "📋 Checking recent logs..."
+          docker compose -f docker-compose.prod.yml logs --tail=50 backend
+
+          echo "✅ Verification complete!"
+
+    - name: Notify Deployment Status
+      if: always()
+      run: |
+        if [ ${{ job.status }} == 'success' ]; then
+          echo "✅ Deployment to Azure VM succeeded!"
+        else
+          echo "❌ Deployment to Azure VM failed!"
+          exit 1
+        fi
