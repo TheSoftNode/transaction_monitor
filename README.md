@@ -1,7 +1,5 @@
 # Transaction Monitoring Platform
 
-> **Smartcomply Senior Backend/Fullstack Engineer Technical Assessment**
-
 A production-grade transaction monitoring platform with real-time risk assessment, event-driven architecture, and ML-powered anomaly detection.
 
 [![Test Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)]()
@@ -29,9 +27,9 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 
 ## ✨ Features
 
-### Core Functionality (100/100 marks)
+### Core Functionality
 
-#### Backend API (30 marks) ✅
+#### Backend API
 - **RESTful API** with Django REST Framework
 - **JWT Authentication** for secure access
 - **Customer Management**: Create, list, and manage customers
@@ -42,7 +40,7 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 - **Input Validation**: Comprehensive request validation with detailed error messages
 - **Proper Error Handling**: Structured error responses with request tracking
 
-#### Rule Engine (20 marks) ✅
+#### Rule Engine
 - **Extensible Architecture**: Plugin-based rule system using Registry pattern
 - **Dynamic Rule Loading**: Database-driven rule configuration
 - **Pre-built Rules**:
@@ -56,7 +54,7 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 - **Audit Logging**: Complete audit trail of all rule evaluations
 - **Easy Extension**: Add new rules by extending `BaseRule` class
 
-#### Event-Driven Architecture (10 marks) ✅
+#### Event-Driven Architecture
 - **Apache Kafka**: Production-grade message broker
 - **Async Processing**: Independent event processor service
 - **Transaction Events**: Publish `transaction.created` events
@@ -64,7 +62,7 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 - **Rust Integration**: High-performance risk scoring via Rust microservice
 - **Fault Tolerance**: Graceful degradation and error handling
 
-#### Production Readiness (10 marks) ✅
+#### Production Readiness
 - **Structured Logging**: JSON logging with request IDs for traceability
 - **Health Endpoint**: `/health/` - Database and cache health checks
 - **Metrics Endpoint**: `/metrics` - Prometheus-compatible metrics
@@ -74,7 +72,7 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 - **Database Indexing**: Optimized indexes for common queries
 - **Centralized Configuration**: Environment-based settings management
 
-#### DevOps & Deployment (10 marks) ✅
+#### DevOps & Deployment
 - **Docker Containerization**: Multi-stage Docker builds for optimization
 - **Docker Compose**: Single-command deployment (`docker compose up`)
 - **Database Migrations**: Automated Django migrations
@@ -82,7 +80,7 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 - **Environment Configuration**: `.env.example` with secure defaults
 - **Production Scripts**: Health checks, deployment automation
 
-#### Testing (10 marks) ✅
+#### Testing
 - **97% Code Coverage**: Comprehensive test suite
 - **99 Tests**: Covering all critical paths
 - **Unit Tests**: Individual component testing
@@ -92,27 +90,27 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 - **Rule Engine Tests**: All rules and edge cases
 - **CI Integration**: Automated testing in GitHub Actions
 
-### Bonus Features ✅
+### Advanced Features
 
-#### Rust Microservice ✨
+#### Rust Microservice
 - **High-Performance Risk Scoring**: Rust service for performance-critical operations
 - **RESTful API**: Independent service on port 8001
 - **Docker Integration**: Seamlessly integrated with Docker Compose
 - **Health Checks**: Monitoring and observability
 
-#### CI/CD Pipeline ✨
+#### CI/CD Pipeline
 - **GitHub Actions**: Automated testing and deployment
-- **Backend CI**: Run tests on every push/PR
-- **Backend CD**: Auto-deploy to Azure VM on push to `main`
+- **Continuous Integration**: Run tests on every push/PR
+- **Continuous Deployment**: Auto-deploy to Azure VM on push to `main`
 - **Path-Based Triggers**: Only deploy when backend/rust code changes
 
-#### Observability ✨
+#### Observability
 - **Prometheus Integration**: Metrics collection and monitoring
 - **Grafana Dashboard**: Real-time visualization
 - **Custom Metrics**: Transaction counts, risk scores, ML predictions
 - **Alerting**: Prometheus alerting rules
 
-#### ML/AI Anomaly Detection ✨
+#### ML/AI Anomaly Detection
 - **Isolation Forest**: Unsupervised anomaly detection
 - **Feature Engineering**: Transaction amount, time, customer behavior
 - **Real-Time Scoring**: ML prediction on every transaction
@@ -120,9 +118,9 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 - **Metrics API**: `/api/v1/transactions/ml-metrics/`
 - **Scikit-learn**: Production ML library
 
-#### Infrastructure as Code ⚠️
-- **Kubernetes Manifests**: Complete K8s deployment (ready but not deployed)
-- **Terraform**: AWS infrastructure (needs Azure conversion)
+#### Infrastructure as Code
+- **Kubernetes Manifests**: Complete K8s deployment configurations
+- **Terraform**: Infrastructure provisioning (AWS-based)
 
 ---
 
@@ -1065,33 +1063,27 @@ Pre-configured dashboard includes:
 
 ## 👥 Contributing
 
-This is a technical assessment project. Contributions are not expected.
+Contributions, issues, and feature requests are welcome! Feel free to check the issues page.
 
 ---
 
 ## 📄 License
 
-This project is created for Smartcomply's technical assessment.
+MIT License
 
 ---
 
 ## 📧 Contact
 
-**Candidate**: Theophilus Onyebuchi
+**Author**: Theophilus Onyebuchi
 **Email**: theomatthewipt@gmail.com
 **GitHub**: https://github.com/TheSoftNode/transaction_monitor
-**Assessment**: Smartcomply Senior Backend/Fullstack Engineer
 
 ---
 
 ## 🙏 Acknowledgments
 
-- **Smartcomply** for the comprehensive and challenging assessment
 - **Django** and **DRF** communities for excellent documentation
 - **Rust** community for performance-critical tools
 - **Apache Kafka** for reliable event streaming
 - **Scikit-learn** for accessible ML tools
-
----
-
-**Built with ❤️ for Smartcomply**
