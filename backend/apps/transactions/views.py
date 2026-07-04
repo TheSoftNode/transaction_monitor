@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
+from prometheus_client import Counter
 from .models import Transaction
 from .serializers import (
     TransactionSerializer,
@@ -14,6 +15,9 @@ from .filters import TransactionFilter
 from infrastructure.messaging.kafka import KafkaMessagePublisher
 
 logger = logging.getLogger(__name__)
+
+# Prometheus metrics
+transaction_counter = Counter('transactions_total', 'Total number of transactions')
 
 
 class TransactionViewSet(viewsets.ModelViewSet):
@@ -33,6 +37,9 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         transaction = serializer.save()
+
+        # Increment Prometheus counter
+        transaction_counter.inc()
 
         try:
             publisher = KafkaMessagePublisher()
