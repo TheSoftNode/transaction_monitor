@@ -6,7 +6,7 @@ on:
     paths:
       - 'backend/**'
       - 'rust-risk-scorer/**'
-      - '.github/workflows/cd.yml'
+      - '.github/workflows/backend-cd.yml'
 
 jobs:
   deploy:
