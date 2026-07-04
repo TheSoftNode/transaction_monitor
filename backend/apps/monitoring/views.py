@@ -4,12 +4,11 @@ from django.db import connection
 from django.core.cache import cache
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from prometheus_client import Counter, Histogram, generate_latest
+from prometheus_client import Histogram, generate_latest
 from django.http import HttpResponse
 
 logger = logging.getLogger(__name__)
 
-transaction_counter = Counter('transactions_total', 'Total number of transactions')
 api_request_duration = Histogram('api_request_duration_seconds', 'API request duration')
 
 
