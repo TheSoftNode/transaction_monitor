@@ -117,7 +117,7 @@ services:
       DEBUG: ${DEBUG:-False}
       DB_HOST: postgres
       DB_PORT: 5432
-      REDIS_URL: redis://redis:6379/0
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       RUST_RISK_SCORER_URL: http://rust-scorer:8001
     ports:
@@ -154,7 +154,7 @@ services:
       DEBUG: ${DEBUG:-False}
       DB_HOST: postgres
       DB_PORT: 5432
-      REDIS_URL: redis://redis:6379/0
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       RUST_RISK_SCORER_URL: http://rust-scorer:8001
     volumes:
