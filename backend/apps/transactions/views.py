@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
+from django.db import models
 from prometheus_client import Counter
 from .models import Transaction
 from .serializers import (
@@ -13,11 +14,13 @@ from .serializers import (
 )
 from .filters import TransactionFilter
 from infrastructure.messaging.kafka import KafkaMessagePublisher
+from ml.anomaly_detector import detector as ml_detector
 
 logger = logging.getLogger(__name__)
 
 # Prometheus metrics
 transaction_counter = Counter('transactions_total', 'Total number of transactions')
+ml_anomaly_counter = Counter('ml_anomalies_detected', 'Total anomalies detected by ML model')
 
 
 class TransactionViewSet(viewsets.ModelViewSet):
@@ -40,6 +43,37 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
         # Increment Prometheus counter
         transaction_counter.inc()
+
+        # ML Anomaly Detection
+        try:
+            ml_result = ml_detector.predict({
+                'amount': float(transaction.amount),
+                'transaction_type': transaction.transaction_type,
+                'customer_risk_level': transaction.customer.risk_level,
+                'is_blacklisted': transaction.customer.is_blacklisted,
+                'country_code': transaction.customer.country,
+                'timestamp': transaction.created_at,
+                'customer_transaction_count': Transaction.objects.filter(
+                    customer=transaction.customer
+                ).count(),
+                'customer_total_volume': float(Transaction.objects.filter(
+                    customer=transaction.customer
+                ).aggregate(total=models.Sum('amount'))['total'] or 0)
+            })
+
+            if ml_result.get('is_anomaly'):
+                ml_anomaly_counter.inc()
+                logger.warning(
+                    f"ML anomaly detected for {transaction.transaction_reference}: "
+                    f"score={ml_result.get('anomaly_score'):.2f}"
+                )
+
+                if transaction.metadata is None:
+                    transaction.metadata = {}
+                transaction.metadata['ml_anomaly'] = ml_result
+                transaction.save(update_fields=['metadata'])
+        except Exception as e:
+            logger.error(f"ML prediction failed: {str(e)}", exc_info=True)
 
         try:
             publisher = KafkaMessagePublisher()
@@ -65,3 +99,13 @@ class TransactionViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='ml-metrics')
+    def ml_metrics(self, request):
+        """Get ML model performance metrics"""
+        metrics = ml_detector.get_metrics()
+        return Response({
+            'ml_model': metrics,
+            'model_status': 'trained' if ml_detector.is_trained else 'untrained',
+            'model_version': ml_detector.MODEL_VERSION
+        })

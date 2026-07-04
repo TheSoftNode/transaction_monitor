@@ -1,4 +1,5 @@
 -r base.txt
+-r ai.txt
 
 django-debug-toolbar>=4.2.0
 django-extensions>=3.2.3
