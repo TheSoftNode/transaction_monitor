@@ -1,7 +1,7 @@
-from django.urls import path
+from django.urls import path, re_path
 from .views import health_check, metrics
 
 urlpatterns = [
-    path('health/', health_check, name='health_check'),
-    path('metrics/', metrics, name='metrics'),
+    re_path(r'^health/?$', health_check, name='health_check'),
+    re_path(r'^metrics/?$', metrics, name='metrics'),
 ]
