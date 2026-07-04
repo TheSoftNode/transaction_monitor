@@ -35,14 +35,12 @@ export function Topbar() {
         <ThemeToggle />
         
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-              <Avatar className="h-10 w-10">
-                <AvatarFallback className="bg-primary text-primary-foreground">
-                  U
-                </AvatarFallback>
-              </Avatar>
-            </Button>
+          <DropdownMenuTrigger className="relative h-10 w-10 rounded-full hover:bg-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <Avatar className="h-10 w-10">
+              <AvatarFallback className="bg-primary text-primary-foreground">
+                U
+              </AvatarFallback>
+            </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="end">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>

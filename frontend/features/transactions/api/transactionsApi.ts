@@ -1,10 +1,14 @@
 import { api } from "@/lib/redux/api"
-import type { Transaction, PaginatedResponse } from "@/types"
+import type {
+  Transaction,
+  TransactionListItem,
+  PaginatedResponse,
+} from "@/types"
 
 export const transactionsApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getTransactions: builder.query<
-      PaginatedResponse<Transaction>,
+      PaginatedResponse<TransactionListItem>,
       {
         page?: number
         search?: string
