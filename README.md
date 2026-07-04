@@ -805,94 +805,27 @@ settings/
 
 ### 1. **Eventual Consistency**
 
-**Trade-off**: Risk scores are calculated asynchronously, not immediately available.
+Risk scores are calculated asynchronously via Kafka, so they're not immediately available when a transaction is created. This gives us better API performance and scalability, but clients need to poll or use webhooks for the final risk score. In practice, processing happens in under 1 second.
 
-**Impact**:
-- ⏱️ Initial transaction response doesn't include final risk score
-- 📊 Need to poll or use webhooks for risk score updates
+### 2. **ML Model Training**
 
-**Mitigation**:
-- Event processing is fast (typically <1 second)
-- Frontend can show "Processing..." state
-- WebSocket support can be added for real-time updates
+The ML anomaly detector needs at least 100 transactions before it can be trained. Until then, it returns a "Model not trained" warning. This is fine because the rule-based engine still works, and you can load seed data for testing.
 
-**Decision**: Acceptable for better API performance and scalability
+### 3. **Kafka for Events**
 
-### 2. **ML Model Requires Training Data**
+We use Kafka because it's the industry standard for event streaming - reliable, scalable, and maintains a complete audit trail. Yes, a single broker setup is a potential failure point, but Kafka restarts quickly and doesn't lose data. For production scale, you'd run a 3-broker cluster. We kept it simple here with Docker Compose.
 
-**Trade-off**: ML anomaly detection needs 100+ transactions before training.
+### 4. **Kubernetes & Terraform Prepared But Not Deployed**
 
-**Impact**:
-- 🎓 New installations show "Model not trained" warnings
-- 📈 Initial transactions won't have ML-based scores
+We have full Kubernetes manifests and Terraform configs ready, but chose Docker Compose for the current deployment. Why? Docker Compose is simpler to set up, easier to debug, and perfectly adequate for the current scale. K8s and Terraform add complexity that's only worth it at higher scale or when you need advanced orchestration features. They're there when needed.
 
-**Mitigation**:
-- System works without ML (uses rule-based scoring)
-- Seed data can be loaded for testing
-- Clear warnings in API responses
+### 5. **Rust Microservice**
 
-**Decision**: Better than no ML at all; graceful degradation
+The Rust service adds another moving part to maintain, but it's 10-100x faster than Python for risk calculations. Worth it for performance-critical operations, especially under high load.
 
-### 3. **Rust Service Adds Complexity**
+### 6. **Frontend Not Included**
 
-**Trade-off**: Additional service to deploy and maintain.
-
-**Impact**:
-- 🔧 More moving parts in production
-- 🐛 Additional failure point
-- 📚 Requires Rust knowledge for modifications
-
-**Mitigation**:
-- Graceful fallback if Rust service unavailable
-- Well-documented API contract
-- Comprehensive health checks
-
-**Decision**: Performance gain worth the complexity
-
-### 4. **No Built-in Frontend**
-
-**Trade-off**: Backend-only implementation; frontend pending.
-
-**Impact**:
-- 👀 No visual dashboard (yet)
-- 📱 Swagger UI for manual testing only
-
-**Mitigation**:
-- Complete API documentation
-- Swagger UI for exploration
-- Frontend can be added independently
-
-**Decision**: Focus on backend excellence first (assessment priority)
-
-### 5. **Single Kafka Broker**
-
-**Trade-off**: One Kafka broker instead of cluster.
-
-**Impact**:
-- 💔 Single point of failure
-- 📉 Limited throughput compared to cluster
-
-**Mitigation**:
-- Sufficient for assessment/demo
-- Easy to scale to cluster in production
-- Docker Compose limitation, not architectural
-
-**Decision**: Simplicity over redundancy for development
-
-### 6. **Synchronous Database Calls**
-
-**Trade-off**: Using Django ORM synchronously instead of async.
-
-**Impact**:
-- 🐌 Slower under extreme load
-- 🔒 Database connection pool limits
-
-**Mitigation**:
-- Adequate for expected load
-- Can migrate to async views if needed
-- Proper indexing optimizes queries
-
-**Decision**: Standard Django approach; proven and reliable
+Backend-first approach. The API is fully documented with Swagger, and a frontend can be added independently without touching the backend.
 
 ---
 
