@@ -51,7 +51,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
                 'transaction_type': transaction.transaction_type,
                 'customer_risk_level': transaction.customer.risk_level,
                 'is_blacklisted': transaction.customer.is_blacklisted,
-                'country_code': transaction.customer.country,
+                'country_code': transaction.customer.country_code,
                 'timestamp': transaction.created_at,
                 'customer_transaction_count': Transaction.objects.filter(
                     customer=transaction.customer
