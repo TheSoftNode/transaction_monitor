@@ -1053,39 +1053,7 @@ Pre-configured dashboard includes:
 
 ---
 
-## 🚧 Roadmap
-
-### Completed ✅
-
-- Backend API with all endpoints
-- Rule engine with 5 pre-built rules
-- Event-driven architecture with Kafka
-- Rust microservice for risk scoring
-- ML anomaly detection
-- 97% test coverage
-- Docker deployment
-- CI/CD pipeline
-- Prometheus + Grafana monitoring
-- Production deployment on Azure
-
-### In Progress 🚧
-
-- Frontend Dashboard (React + TypeScript)
-
-### Planned 📋
-
-- WebSocket support for real-time updates
-- Mobile app (React Native)
-- Advanced ML models (Neural networks)
-- Kubernetes production deployment
-- Azure-native Terraform
-- Advanced alerting (email, SMS, Slack)
-- Multi-tenancy support
-- GraphQL API
-
----
-
-## 👥 Contributing
+## Contributing
 
 Contributions, issues, and feature requests are welcome! Feel free to check the issues page.
 
@@ -1100,7 +1068,7 @@ MIT License
 ## 📧 Contact
 
 **Author**: Theophilus Onyebuchi
-**Email**: theomatthewipt@gmail.com
+**Email**: thesoftnode@gmail.com
 **GitHub**: https://github.com/TheSoftNode/transaction_monitor
 
 ---
