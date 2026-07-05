@@ -51,29 +51,32 @@ export function Sidebar() {
           collapsed ? "lg:w-20" : "lg:w-64"
         )}
       >
-        <div className="flex h-16 items-center justify-between px-4 border-b border-slate-800">
+        <div className="flex h-20 items-center justify-between px-6 border-b border-slate-800/50">
           {!collapsed && (
-            <Link href="/dashboard/transactions" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-violet-500 rounded-lg flex items-center justify-center">
-                <Shield className="h-5 w-5 text-white" />
+            <Link href="/dashboard/transactions" className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-violet-500 rounded-xl flex items-center justify-center shadow-lg shadow-violet-600/20">
+                <Shield className="h-6 w-6 text-white" />
               </div>
-              <span className="font-bold text-lg text-white">SecureGuard</span>
+              <span className="font-bold text-xl text-white tracking-tight">SecureGuard</span>
             </Link>
           )}
           {collapsed && (
-            <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-violet-500 rounded-lg flex items-center justify-center mx-auto">
-              <Shield className="h-5 w-5 text-white" />
+            <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-violet-500 rounded-xl flex items-center justify-center mx-auto shadow-lg shadow-violet-600/20">
+              <Shield className="h-6 w-6 text-white" />
             </div>
           )}
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setCollapsed(!collapsed)}
-            className={cn("h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-800 hidden lg:flex", collapsed && "mx-auto")}
+            className={cn(
+              "h-9 w-9 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all hidden lg:flex",
+              collapsed && "mx-auto"
+            )}
           >
             <ChevronLeft
               className={cn(
-                "h-4 w-4 transition-transform",
+                "h-5 w-5 transition-transform duration-300",
                 collapsed && "rotate-180"
               )}
             />
@@ -82,29 +85,32 @@ export function Sidebar() {
             variant="ghost"
             size="icon"
             onClick={() => setIsMobileOpen(false)}
-            className="h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-800 lg:hidden"
+            className="h-9 w-9 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all lg:hidden"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </Button>
         </div>
 
-        <nav className="p-4 space-y-2">
+        <nav className="p-4 mt-2 space-y-3">
           {navigation.map((item) => {
             const isActive = pathname === item.href
             const Icon = item.icon
             return (
               <Link key={item.name} href={item.href} onClick={() => setIsMobileOpen(false)}>
-                <Button
-                  variant="ghost"
+                <div
                   className={cn(
-                    "w-full justify-start text-slate-400 hover:text-white hover:bg-slate-800",
-                    collapsed && "justify-center px-2",
-                    isActive && "bg-violet-600 text-white hover:bg-violet-700 hover:text-white"
+                    "group flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 cursor-pointer",
+                    collapsed && "justify-center px-3",
+                    isActive
+                      ? "bg-gradient-to-r from-violet-600 to-violet-500 text-white shadow-lg shadow-violet-600/20"
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/50"
                   )}
                 >
-                  <Icon className={cn("h-4 w-4", !collapsed && "mr-2")} />
-                  {!collapsed && <span>{item.name}</span>}
-                </Button>
+                  <Icon className={cn("h-5 w-5 flex-shrink-0 transition-transform group-hover:scale-110")} />
+                  {!collapsed && (
+                    <span className="font-medium text-sm">{item.name}</span>
+                  )}
+                </div>
               </Link>
             )
           })}

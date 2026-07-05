@@ -28,32 +28,21 @@ export default function LoginPage() {
       localStorage.setItem("refresh_token", response.refresh)
 
       // Fetch user profile after login
-      try {
-        const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://40.127.13.42:8000"}/api/v1/auth/user/`, {
-          headers: {
-            Authorization: `Bearer ${response.access}`,
-          },
-        })
-        if (userResponse.ok) {
-          const userData = await userResponse.json()
-          localStorage.setItem("user_data", JSON.stringify({
-            username: userData.username,
-            email: userData.email,
-          }))
-        } else {
-          // Fallback if user endpoint fails
-          localStorage.setItem("user_data", JSON.stringify({
-            username: formData.username,
-            email: formData.username + "@secureguard.app",
-          }))
-        }
-      } catch {
-        // Fallback if fetch fails
-        localStorage.setItem("user_data", JSON.stringify({
-          username: formData.username,
-          email: formData.username + "@secureguard.app",
-        }))
+      const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://40.127.13.42:8000"}/api/v1/auth/user/`, {
+        headers: {
+          Authorization: `Bearer ${response.access}`,
+        },
+      })
+
+      if (!userResponse.ok) {
+        throw new Error("Failed to fetch user profile")
       }
+
+      const userData = await userResponse.json()
+      localStorage.setItem("user_data", JSON.stringify({
+        username: userData.username,
+        email: userData.email,
+      }))
 
       toast.success("Login successful!")
       window.location.href = "/dashboard/transactions"
