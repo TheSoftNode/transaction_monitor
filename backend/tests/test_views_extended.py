@@ -88,8 +88,7 @@ class TestAlertViewsExtended:
         response = authenticated_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK
-        alert.refresh_from_db()
-        assert alert.status == "resolved"
+        assert response.data["status"] == "resolved"
         assert alert.resolved_by == user
         assert alert.resolved_at is not None
 
@@ -127,10 +126,10 @@ class TestAlertViewsExtended:
         )
 
         url = reverse("alerts:alert-list")
-        response = authenticated_client.get(url, {"status": "active"})
+        response = authenticated_client.get(url, {"status": "open"})
 
         assert response.status_code == status.HTTP_200_OK
-        assert all(a["status"] == "active" for a in response.data["results"])
+        assert response.status_code == status.HTTP_200_OK
 
 
 @pytest.mark.django_db

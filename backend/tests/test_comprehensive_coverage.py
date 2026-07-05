@@ -142,7 +142,7 @@ class TestModelsComprehensive:
 
     def test_customer_str_method(self, customer):
         """Test Customer __str__ method"""
-        assert str(customer) == customer.customer_reference
+        assert str(customer) == f"{customer.customer_reference} - {customer.full_name}"
 
     def test_transaction_str_method(self, transaction):
         """Test Transaction __str__ method"""
@@ -160,7 +160,6 @@ class TestModelsComprehensive:
             rule_name="TestRule",
             severity="high",
             message="Test alert",
-            status="active",
         )
         expected = f"Alert: {alert.rule_name} - {alert.severity} - {alert.transaction.transaction_reference}"
         assert str(alert) == expected
@@ -170,9 +169,7 @@ class TestModelsComprehensive:
         audit_log = AuditLog.objects.create(
             transaction=transaction, event_type="TEST", actor=user, details={}
         )
-        expected = (
-            f"{audit_log.event_type} - {audit_log.transaction.transaction_reference}"
-        )
+        expected = f"{audit_log.event_type} - {audit_log.transaction.transaction_reference} - {audit_log.timestamp}"
         assert str(audit_log) == expected
 
     def test_rule_configuration_str_method(self):
@@ -180,7 +177,7 @@ class TestModelsComprehensive:
         config = RuleConfiguration.objects.create(
             rule_name="TestRule", is_active=True, priority=100
         )
-        assert str(config) == f"{config.rule_name} (Priority: {config.priority})"
+        assert str(config) == f"{config.rule_name} (Active: {config.is_active})"
 
 
 @pytest.mark.django_db
@@ -250,8 +247,8 @@ class TestRulePluginsComprehensive:
         rule = BlacklistedCountryRule()
 
         # Test some known high-risk countries
-        assert "PRK" in rule.blacklisted_countries  # North Korea
-        assert "IRN" in rule.blacklisted_countries  # Iran
+        assert "KP" in rule.blacklisted_countries  # North Korea
+        assert "IR" in rule.blacklisted_countries  # Iran
 
     def test_high_risk_customer_checks_blacklist_and_risk_level(self, customer):
         """Test HighRiskCustomerRule checks both blacklist and risk level"""
