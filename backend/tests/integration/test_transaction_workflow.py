@@ -1,10 +1,10 @@
+from decimal import Decimal
+
 import pytest
+from apps.alerts.models import Alert, AuditLog
+from apps.transactions.models import Transaction
 from django.urls import reverse
 from rest_framework import status
-from apps.transactions.models import Transaction
-from apps.alerts.models import Alert
-from apps.alerts.models import AuditLog
-from decimal import Decimal
 
 
 @pytest.mark.django_db

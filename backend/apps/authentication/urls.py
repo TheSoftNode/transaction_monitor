@@ -1,6 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
-from .views import RegisterView, CustomTokenObtainPairView, UserProfileView
+
+from .views import CustomTokenObtainPairView, RegisterView, UserProfileView
 
 app_name = "authentication"
 

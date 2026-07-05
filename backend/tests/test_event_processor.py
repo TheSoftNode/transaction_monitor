@@ -1,8 +1,9 @@
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 from decimal import Decimal
-from apps.transactions.models import Transaction
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
 from apps.customers.models import Customer
+from apps.transactions.models import Transaction
 from event_processor.handlers import TransactionEventHandler
 
 

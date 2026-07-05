@@ -1,16 +1,13 @@
-from rest_framework import viewsets, filters, status
+from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
-from django.utils import timezone
-from .models import Alert, AuditLog
-from .serializers import (
-    AlertSerializer,
-    AlertListSerializer,
-    AlertResolveSerializer,
-    AuditLogSerializer,
-)
+
 from .filters import AlertFilter, AuditLogFilter
+from .models import Alert, AuditLog
+from .serializers import (AlertListSerializer, AlertResolveSerializer,
+                          AlertSerializer, AuditLogSerializer)
 
 
 class AlertViewSet(viewsets.ModelViewSet):

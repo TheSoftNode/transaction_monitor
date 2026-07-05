@@ -1,11 +1,13 @@
 #!/usr/bin/env python
+import logging
 import signal
 import sys
-import logging
+
 from django.conf import settings
 from infrastructure.messaging.kafka import KafkaMessageConsumer
-from .handlers import TransactionEventHandler
+
 from .config import *  # noqa - Initialize Django
+from .handlers import TransactionEventHandler
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

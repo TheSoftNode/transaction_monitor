@@ -1,7 +1,8 @@
 import uuid
-from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
+
 from apps.customers.models import Customer
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
 
 class Transaction(models.Model):

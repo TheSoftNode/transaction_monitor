@@ -1,11 +1,11 @@
 import logging
-from django.http import JsonResponse
-from django.db import connection
+
 from django.core.cache import cache
+from django.db import connection
+from django.http import HttpResponse, JsonResponse
+from prometheus_client import Histogram, generate_latest
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from prometheus_client import Histogram, generate_latest
-from django.http import HttpResponse
 
 logger = logging.getLogger(__name__)
 

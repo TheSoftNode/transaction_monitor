@@ -1,20 +1,19 @@
 import logging
-from rest_framework import viewsets, filters, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
+
 from django.conf import settings
 from django.db import models
-from prometheus_client import Counter
-from .models import Transaction
-from .serializers import (
-    TransactionSerializer,
-    TransactionListSerializer,
-    TransactionStatusUpdateSerializer,
-)
-from .filters import TransactionFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from infrastructure.messaging.kafka import KafkaMessagePublisher
 from ml.anomaly_detector import detector as ml_detector
+from prometheus_client import Counter
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
+from .filters import TransactionFilter
+from .models import Transaction
+from .serializers import (TransactionListSerializer, TransactionSerializer,
+                          TransactionStatusUpdateSerializer)
 
 logger = logging.getLogger(__name__)
 

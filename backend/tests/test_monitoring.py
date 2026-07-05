@@ -1,9 +1,10 @@
-import pytest
 import json
+from unittest.mock import patch
+
+import pytest
+from django.core.cache import cache
 from django.urls import reverse
 from rest_framework import status
-from unittest.mock import patch
-from django.core.cache import cache
 
 
 @pytest.mark.django_db

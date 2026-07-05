@@ -1,15 +1,16 @@
-import pytest
-from decimal import Decimal
-from django.utils import timezone
 from datetime import timedelta
+from decimal import Decimal
+
+import pytest
+from apps.alerts.models import Alert
 from apps.customers.models import Customer
 from apps.transactions.models import Transaction
-from apps.alerts.models import Alert
+from django.utils import timezone
 from rules.engine import RuleEngine
+from rules.plugins.customer_risk import HighRiskCustomerRule
+from rules.plugins.geographic import BlacklistedCountryRule
 from rules.plugins.high_value import HighValueTransactionRule
 from rules.plugins.velocity import VelocityRule
-from rules.plugins.geographic import BlacklistedCountryRule
-from rules.plugins.customer_risk import HighRiskCustomerRule
 
 
 @pytest.mark.django_db

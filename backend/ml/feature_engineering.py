@@ -1,6 +1,7 @@
-import numpy as np
 from datetime import datetime
-from typing import Dict, Any
+from typing import Any, Dict
+
+import numpy as np
 
 
 class FeatureExtractor:

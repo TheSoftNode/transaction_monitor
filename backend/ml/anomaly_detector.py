@@ -1,13 +1,14 @@
-import os
 import logging
-import numpy as np
-from typing import Dict, Any, Optional, List, Tuple
+import os
 from datetime import datetime
-from sklearn.ensemble import IsolationForest
-from sklearn.preprocessing import RobustScaler
-from sklearn.model_selection import train_test_split
+from typing import Any, Dict, List, Optional, Tuple
+
 import joblib
+import numpy as np
 from django.conf import settings
+from sklearn.ensemble import IsolationForest
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import RobustScaler
 
 from .feature_engineering import FeatureExtractor
 

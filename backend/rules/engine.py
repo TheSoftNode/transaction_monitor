@@ -1,12 +1,14 @@
 import logging
 from typing import List, Optional
-from django.db import transaction as db_transaction
-from django.conf import settings
-from apps.transactions.models import Transaction
+
 from apps.alerts.models import Alert, AuditLog
+from apps.transactions.models import Transaction
+from django.conf import settings
+from django.db import transaction as db_transaction
+
+from .base import BaseRule
 from .models import RuleConfiguration
 from .registry import RuleRegistry
-from .base import BaseRule
 
 logger = logging.getLogger(__name__)
 

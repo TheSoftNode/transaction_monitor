@@ -1,10 +1,12 @@
 import json
 import logging
-from typing import Dict, Any, Callable
-from kafka import KafkaProducer, KafkaConsumer
-from kafka.errors import KafkaError
+from typing import Any, Callable, Dict
+
 from django.conf import settings
-from .base import BaseMessagePublisher, BaseMessageConsumer
+from kafka import KafkaConsumer, KafkaProducer
+from kafka.errors import KafkaError
+
+from .base import BaseMessageConsumer, BaseMessagePublisher
 
 logger = logging.getLogger(__name__)
 

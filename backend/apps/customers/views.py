@@ -1,8 +1,9 @@
-from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Customer
-from .serializers import CustomerSerializer, CustomerListSerializer
+from rest_framework import filters, viewsets
+
 from .filters import CustomerFilter
+from .models import Customer
+from .serializers import CustomerListSerializer, CustomerSerializer
 
 
 class CustomerViewSet(viewsets.ModelViewSet):

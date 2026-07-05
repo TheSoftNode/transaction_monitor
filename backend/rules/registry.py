@@ -1,4 +1,5 @@
-from typing import Dict, Type, List
+from typing import Dict, List, Type
+
 from .base import BaseRule
 
 

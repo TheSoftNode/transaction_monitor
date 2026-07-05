@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from apps.transactions.models import Transaction
 from rules.base import BaseRule
 from rules.registry import RuleRegistry

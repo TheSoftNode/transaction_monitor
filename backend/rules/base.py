@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict
 
 if TYPE_CHECKING:
     from apps.transactions.models import Transaction

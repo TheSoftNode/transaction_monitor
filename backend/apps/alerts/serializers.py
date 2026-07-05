@@ -1,6 +1,7 @@
-from rest_framework import serializers
-from .models import Alert, AuditLog
 from apps.transactions.serializers import TransactionListSerializer
+from rest_framework import serializers
+
+from .models import Alert, AuditLog
 
 
 class AlertSerializer(serializers.ModelSerializer):

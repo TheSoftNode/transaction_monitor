@@ -2,17 +2,18 @@
 Comprehensive tests to achieve 95%+ coverage
 """
 
-import pytest
-from decimal import Decimal
-from unittest.mock import patch, MagicMock
-from django.utils import timezone
 from datetime import timedelta
+from decimal import Decimal
+from unittest.mock import MagicMock, patch
+
+import pytest
+from apps.alerts.models import Alert, AuditLog
 from apps.customers.models import Customer
 from apps.transactions.models import Transaction
-from apps.alerts.models import Alert, AuditLog
+from django.utils import timezone
+from rules.base import BaseRule
 from rules.engine import RuleEngine
 from rules.models import RuleConfiguration
-from rules.base import BaseRule
 from rules.registry import RuleRegistry
 
 
