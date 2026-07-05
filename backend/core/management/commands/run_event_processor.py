@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+
 from event_processor.main import EventProcessor
 
 

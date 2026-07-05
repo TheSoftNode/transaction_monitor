@@ -7,6 +7,8 @@ from decimal import Decimal
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
+from django.contrib.auth import get_user_model
+
 from apps.alerts.models import Alert, AuditLog
 from apps.alerts.serializers import AlertSerializer, AuditLogSerializer
 from apps.authentication.serializers import RegisterSerializer
@@ -14,7 +16,6 @@ from apps.customers.models import Customer
 from apps.customers.serializers import CustomerSerializer
 from apps.transactions.models import Transaction
 from apps.transactions.serializers import TransactionSerializer
-from django.contrib.auth import get_user_model
 from rules.base import BaseRule
 from rules.engine import RuleEngine
 from rules.models import RuleConfiguration

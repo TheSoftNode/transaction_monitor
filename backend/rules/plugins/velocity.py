@@ -1,7 +1,8 @@
 from datetime import timedelta
 
-from apps.transactions.models import Transaction
 from django.utils import timezone
+
+from apps.transactions.models import Transaction
 from rules.base import BaseRule
 from rules.registry import RuleRegistry
 

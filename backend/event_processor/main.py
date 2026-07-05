@@ -4,6 +4,7 @@ import signal
 import sys
 
 from django.conf import settings
+
 from infrastructure.messaging.kafka import KafkaMessageConsumer
 
 from .config import *  # noqa - Initialize Django

@@ -1,10 +1,11 @@
 from decimal import Decimal
 
 import pytest
-from apps.customers.models import Customer
-from apps.transactions.models import Transaction
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
+
+from apps.customers.models import Customer
+from apps.transactions.models import Transaction
 from rules.models import RuleConfiguration
 
 User = get_user_model()

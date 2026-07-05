@@ -2,10 +2,11 @@ from datetime import timedelta
 from decimal import Decimal
 
 import pytest
+from django.utils import timezone
+
 from apps.alerts.models import Alert, AuditLog
 from apps.customers.models import Customer
 from apps.transactions.models import Transaction
-from django.utils import timezone
 from rules.engine import RuleEngine
 from rules.models import RuleConfiguration
 from rules.plugins.customer_risk import HighRiskCustomerRule

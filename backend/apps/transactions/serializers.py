@@ -1,5 +1,6 @@
-from apps.customers.serializers import CustomerListSerializer
 from rest_framework import serializers
+
+from apps.customers.serializers import CustomerListSerializer
 
 from .models import Transaction
 

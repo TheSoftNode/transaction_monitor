@@ -7,10 +7,11 @@ from decimal import Decimal
 from unittest.mock import MagicMock, patch
 
 import pytest
+from django.utils import timezone
+
 from apps.alerts.models import Alert, AuditLog
 from apps.customers.models import Customer
 from apps.transactions.models import Transaction
-from django.utils import timezone
 from rules.base import BaseRule
 from rules.engine import RuleEngine
 from rules.models import RuleConfiguration

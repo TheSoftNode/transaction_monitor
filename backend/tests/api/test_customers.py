@@ -1,7 +1,8 @@
 import pytest
-from apps.customers.models import Customer
 from django.urls import reverse
 from rest_framework import status
+
+from apps.customers.models import Customer
 
 
 @pytest.mark.django_db

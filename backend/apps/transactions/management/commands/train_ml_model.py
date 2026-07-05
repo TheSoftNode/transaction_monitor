@@ -1,8 +1,9 @@
 import logging
 
-from apps.transactions.models import Transaction
 from django.core.management.base import BaseCommand
 from django.db.models import Sum
+
+from apps.transactions.models import Transaction
 from ml.anomaly_detector import detector
 
 logger = logging.getLogger(__name__)

@@ -1,10 +1,11 @@
 import logging
 from typing import List, Optional
 
-from apps.alerts.models import Alert, AuditLog
-from apps.transactions.models import Transaction
 from django.conf import settings
 from django.db import transaction as db_transaction
+
+from apps.alerts.models import Alert, AuditLog
+from apps.transactions.models import Transaction
 
 from .base import BaseRule
 from .models import RuleConfiguration

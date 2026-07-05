@@ -2,6 +2,7 @@ from decimal import Decimal
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
+
 from apps.customers.models import Customer
 from apps.transactions.models import Transaction
 from event_processor.handlers import TransactionEventHandler

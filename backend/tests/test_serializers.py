@@ -1,6 +1,8 @@
 from decimal import Decimal
 
 import pytest
+from django.contrib.auth import get_user_model
+
 from apps.alerts.models import Alert, AuditLog
 from apps.alerts.serializers import AlertSerializer, AuditLogSerializer
 from apps.authentication.serializers import (
@@ -11,7 +13,6 @@ from apps.customers.models import Customer
 from apps.customers.serializers import CustomerSerializer
 from apps.transactions.models import Transaction
 from apps.transactions.serializers import TransactionSerializer
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
