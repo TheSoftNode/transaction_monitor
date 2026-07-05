@@ -1,37 +1,52 @@
 "use client"
 
-import { useEffect } from "react"
-import { useSelector } from "react-redux"
-import { useRouter } from "next/navigation"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Topbar } from "@/components/layout/topbar"
-import type { RootState } from "@/lib/redux/store"
+import { useAuth } from "@/hooks/useAuth"
+import { SidebarProvider, useSidebar } from "@/contexts/sidebar-context"
+import { cn } from "@/lib/utils"
+
+function DashboardContent({ children }: { children: React.ReactNode }) {
+  const { collapsed } = useSidebar()
+
+  return (
+    <div className="min-h-screen bg-slate-950">
+      <Sidebar />
+      <div
+        className={cn(
+          "transition-all duration-300",
+          collapsed ? "lg:pl-20" : "lg:pl-64"
+        )}
+      >
+        <Topbar />
+        <main className="p-4 lg:p-6">{children}</main>
+      </div>
+    </div>
+  )
+}
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const { token } = useSelector((state: RootState) => state.auth)
-  const router = useRouter()
+  const { isAuthenticated, isLoading } = useAuth(true)
 
-  useEffect(() => {
-    if (!token) {
-      router.push("/auth/login")
-    }
-  }, [token, router])
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    )
+  }
 
-  if (!token) {
+  if (!isAuthenticated) {
     return null
   }
 
   return (
-    <div className="min-h-screen">
-      <Sidebar />
-      <div className="pl-64">
-        <Topbar />
-        <main className="p-6">{children}</main>
-      </div>
-    </div>
+    <SidebarProvider>
+      <DashboardContent>{children}</DashboardContent>
+    </SidebarProvider>
   )
 }

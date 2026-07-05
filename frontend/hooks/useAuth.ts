@@ -1,17 +1,53 @@
-import { useSelector } from "react-redux"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
-import type { RootState } from "@/lib/redux/store"
+"use client"
 
-export function useAuth(requireAuth = true) {
-  const { isAuthenticated, token } = useSelector((state: RootState) => state.auth)
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+
+interface User {
+  username: string
+  email: string
+}
+
+export function useAuth(requireAuth = false) {
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
-    if (requireAuth && !isAuthenticated && !token) {
-      router.push("/auth/login")
-    }
-  }, [isAuthenticated, token, requireAuth, router])
+    const checkAuth = () => {
+      const token = localStorage.getItem("access_token")
+      const userData = localStorage.getItem("user_data")
 
-  return { isAuthenticated, token }
+      if (token && userData) {
+        try {
+          setUser(JSON.parse(userData))
+        } catch {
+          setUser(null)
+        }
+      } else {
+        setUser(null)
+        if (requireAuth) {
+          router.push("/auth/login")
+        }
+      }
+      setIsLoading(false)
+    }
+
+    checkAuth()
+  }, [requireAuth, router])
+
+  const logout = () => {
+    localStorage.removeItem("access_token")
+    localStorage.removeItem("refresh_token")
+    localStorage.removeItem("user_data")
+    setUser(null)
+    window.location.href = "/"
+  }
+
+  return {
+    user,
+    isAuthenticated: !!user,
+    isLoading,
+    logout,
+  }
 }

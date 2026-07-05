@@ -29,6 +29,21 @@ export const alertsApi = api.injectEndpoints({
       query: (id) => `/alerts/${id}/`,
       providesTags: (_result, _error, id) => [{ type: "Alert", id }],
     }),
+    updateAlert: builder.mutation<Alert, { id: string; data: Partial<Alert> }>({
+      query: ({ id, data }) => ({
+        url: `/alerts/${id}/`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: (_result, _error, { id }) => [{ type: "Alert", id }, "Alert"],
+    }),
+    deleteAlert: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/alerts/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Alert"],
+    }),
     resolveAlert: builder.mutation<
       Alert,
       { id: string; status: "resolved" | "false_positive" }
@@ -59,6 +74,8 @@ export const alertsApi = api.injectEndpoints({
 export const {
   useGetAlertsQuery,
   useGetAlertQuery,
+  useUpdateAlertMutation,
+  useDeleteAlertMutation,
   useResolveAlertMutation,
   useGetAuditLogsQuery,
 } = alertsApi

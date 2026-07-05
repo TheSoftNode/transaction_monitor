@@ -23,12 +23,21 @@ export default function RootLayout({
         <ReduxProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="light"
-            enableSystem
+            defaultTheme="dark"
+            enableSystem={false}
             disableTransitionOnChange
           >
             {children}
-            <Toaster />
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                style: {
+                  background: '#1e293b',
+                  color: '#fff',
+                  border: '1px solid #334155',
+                },
+              }}
+            />
           </ThemeProvider>
         </ReduxProvider>
       </body>

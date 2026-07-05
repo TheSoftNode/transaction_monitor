@@ -34,6 +34,35 @@ export const transactionsApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Transaction"],
     }),
+    updateTransaction: builder.mutation<
+      Transaction,
+      { id: string; data: Partial<Transaction> }
+    >({
+      query: ({ id, data }) => ({
+        url: `/transactions/${id}/`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["Transaction"],
+    }),
+    patchTransaction: builder.mutation<
+      Transaction,
+      { id: string; data: Partial<Transaction> }
+    >({
+      query: ({ id, data }) => ({
+        url: `/transactions/${id}/`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["Transaction"],
+    }),
+    deleteTransaction: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/transactions/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Transaction"],
+    }),
     updateTransactionStatus: builder.mutation<
       Transaction,
       { id: string; status: string }
@@ -52,5 +81,8 @@ export const {
   useGetTransactionsQuery,
   useGetTransactionQuery,
   useCreateTransactionMutation,
+  useUpdateTransactionMutation,
+  usePatchTransactionMutation,
+  useDeleteTransactionMutation,
   useUpdateTransactionStatusMutation,
 } = transactionsApi

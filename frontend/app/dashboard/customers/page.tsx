@@ -1,194 +1,150 @@
 "use client"
 
 import { useState } from "react"
-import { Search, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Plus, Users, Shield, AlertTriangle, UserCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { CustomerFilters } from "@/components/customers/customer-filters"
+import { CustomerList } from "@/components/customers/customer-list"
+import { CustomerPagination } from "@/components/customers/customer-pagination"
+import { CreateCustomerDialog } from "@/components/customers/create-customer-dialog"
+import { CustomerDetailsDialog } from "@/components/customers/customer-details-dialog"
 import { useGetCustomersQuery } from "@/features/customers/api/customersApi"
+import type { Customer } from "@/types"
 
 export default function CustomersPage() {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState("")
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
 
-  const { data, isLoading, isFetching } = useGetCustomersQuery({
+  const { data, isLoading } = useGetCustomersQuery({
     page,
     search: search || undefined,
   })
 
-  const getRiskLevelColor = (level: string) => {
-    switch (level) {
-      case "high":
-        return "bg-destructive/10 text-destructive border-destructive/20"
-      case "medium":
-        return "bg-secondary/10 text-secondary border-secondary/20"
-      case "low":
-        return "bg-accent/10 text-accent border-accent/20"
-      default:
-        return "bg-muted"
-    }
-  }
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    })
-  }
-
   const totalPages = data ? Math.ceil(data.count / 20) : 0
+
+  // Calculate stats
+  const stats = data?.results.reduce(
+    (acc, c) => {
+      acc.total++
+      if (c.risk_level === "high") acc.highRisk++
+      if (c.risk_level === "low") acc.lowRisk++
+      if (c.is_blacklisted) acc.blacklisted++
+      return acc
+    },
+    { total: 0, highRisk: 0, lowRisk: 0, blacklisted: 0 }
+  ) || { total: 0, highRisk: 0, lowRisk: 0, blacklisted: 0 }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
-          <p className="text-muted-foreground">
-            View and manage customer profiles
+          <h1 className="text-3xl font-bold text-white">Customers</h1>
+          <p className="text-slate-400 mt-1">
+            Manage customer profiles and risk assessments
           </p>
         </div>
+        <Button
+          onClick={() => setCreateDialogOpen(true)}
+          className="bg-violet-600 hover:bg-violet-700 text-white"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Customer
+        </Button>
       </div>
 
-      {/* Search */}
-      <Card>
+      {/* Stats Cards */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="bg-slate-900 border-slate-800">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-400">
+              Total Customers
+            </CardTitle>
+            <Users className="h-4 w-4 text-slate-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{data?.count || 0}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-900 border-slate-800">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-400">
+              Low Risk
+            </CardTitle>
+            <UserCheck className="h-4 w-4 text-green-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-400">{stats.lowRisk}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-900 border-slate-800">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-400">
+              High Risk
+            </CardTitle>
+            <AlertTriangle className="h-4 w-4 text-red-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-400">{stats.highRisk}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-900 border-slate-800">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-400">
+              Blacklisted
+            </CardTitle>
+            <Shield className="h-4 w-4 text-red-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-400">{stats.blacklisted}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <Card className="bg-slate-900 border-slate-800">
         <CardContent className="pt-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by name, email, or reference..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9"
-            />
-          </div>
+          <CustomerFilters search={search} onSearchChange={setSearch} />
         </CardContent>
       </Card>
 
-      {/* Table */}
-      <Card>
+      {/* Customer List */}
+      <Card className="bg-slate-900 border-slate-800">
         <CardHeader>
-          <CardTitle>
-            {data?.count || 0} Customer{data?.count !== 1 ? "s" : ""}
+          <CardTitle className="text-white">
+            {isLoading ? "Loading..." : `${data?.results.length || 0} Customers`}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="rounded-md border overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Reference</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Country</TableHead>
-                  <TableHead>Risk Level</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Joined</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading || isFetching ? (
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <TableRow key={i}>
-                      {Array.from({ length: 7 }).map((_, j) => (
-                        <TableCell key={j}>
-                          <Skeleton className="h-4 w-full" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : data?.results.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8">
-                      <p className="text-muted-foreground">No customers found</p>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  data?.results.map((customer) => (
-                    <TableRow key={customer.id}>
-                      <TableCell className="font-mono text-sm">
-                        {customer.customer_reference}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {customer.full_name}
-                      </TableCell>
-                      <TableCell>{customer.email}</TableCell>
-                      <TableCell className="uppercase text-sm">
-                        {customer.country_code}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className={getRiskLevelColor(customer.risk_level)}
-                        >
-                          {customer.risk_level}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {customer.is_blacklisted ? (
-                          <Badge variant="destructive" className="gap-1">
-                            <AlertCircle className="h-3 w-3" />
-                            Blacklisted
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline" className="bg-accent/10 text-accent border-accent/20">
-                            Active
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {formatDate(customer.created_at)}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Pagination */}
-          {data && totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
-              <p className="text-sm text-muted-foreground">
-                Showing {(page - 1) * 20 + 1} to{" "}
-                {Math.min(page * 20, data.count)} of {data.count} results
-              </p>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setPage(page - 1)}
-                  disabled={!data.previous}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <span className="text-sm">
-                  Page {page} of {totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setPage(page + 1)}
-                  disabled={!data.next}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
+        <CardContent className="space-y-4">
+          <CustomerList
+            customers={data?.results}
+            isLoading={isLoading}
+            onViewDetails={setSelectedCustomer}
+          />
+          <CustomerPagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
         </CardContent>
       </Card>
+
+      {/* Dialogs */}
+      <CreateCustomerDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+      />
+      <CustomerDetailsDialog
+        customer={selectedCustomer}
+        open={!!selectedCustomer}
+        onOpenChange={(open) => !open && setSelectedCustomer(null)}
+      />
     </div>
   )
 }

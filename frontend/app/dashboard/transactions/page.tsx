@@ -1,43 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
-import {
-  Search,
-  Filter,
-  Download,
-  Plus,
-  Eye,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Plus, CreditCard, TrendingUp, AlertTriangle, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { TransactionFilters } from "@/components/transactions/transaction-filters"
+import { TransactionList } from "@/components/transactions/transaction-list"
+import { TransactionPagination } from "@/components/transactions/transaction-pagination"
+import { CreateTransactionDialog } from "@/components/transactions/create-transaction-dialog"
+import { TransactionDetailsDialog } from "@/components/transactions/transaction-details-dialog"
 import { useGetTransactionsQuery } from "@/features/transactions/api/transactionsApi"
 import type { TransactionListItem } from "@/types"
 
@@ -45,283 +16,143 @@ export default function TransactionsPage() {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState("")
   const [status, setStatus] = useState("all")
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<TransactionListItem | null>(null)
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [selectedTransaction, setSelectedTransaction] = useState<TransactionListItem | null>(null)
 
-  const { data, isLoading, isFetching } = useGetTransactionsQuery({
+  const { data, isLoading } = useGetTransactionsQuery({
     page,
     search: search || undefined,
     status: status === "all" ? undefined : status,
     ordering: "-created_at",
   })
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "approved":
-        return "bg-accent/10 text-accent border-accent/20"
-      case "rejected":
-        return "bg-destructive/10 text-destructive border-destructive/20"
-      case "under_review":
-        return "bg-secondary/10 text-secondary border-secondary/20"
-      default:
-        return "bg-primary/10 text-primary border-primary/20"
-    }
-  }
-
-  const getRiskColor = (score: number) => {
-    if (score >= 70) return "text-destructive"
-    if (score >= 40) return "text-secondary"
-    return "text-accent"
-  }
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-  }
-
-  const formatDetailDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleString("en-US", {
-      dateStyle: "long",
-      timeStyle: "short",
-    })
-  }
-
   const totalPages = data ? Math.ceil(data.count / 20) : 0
+
+  // Calculate stats
+  const stats = data?.results.reduce(
+    (acc, t) => {
+      acc.total++
+      if (t.status === "approved") acc.approved++
+      if (t.status === "pending") acc.pending++
+      if (t.risk_score >= 70) acc.highRisk++
+      return acc
+    },
+    { total: 0, approved: 0, pending: 0, highRisk: 0 }
+  ) || { total: 0, approved: 0, pending: 0, highRisk: 0 }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Transactions</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-bold text-white">Transactions</h1>
+          <p className="text-slate-400 mt-1">
             Monitor and manage all financial transactions
           </p>
         </div>
+        <Button
+          onClick={() => setCreateDialogOpen(true)}
+          className="bg-violet-600 hover:bg-violet-700 text-white"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          New Transaction
+        </Button>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="bg-slate-900 border-slate-800">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-400">
+              Total Transactions
+            </CardTitle>
+            <CreditCard className="h-4 w-4 text-slate-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{data?.count || 0}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-900 border-slate-800">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-400">
+              Approved
+            </CardTitle>
+            <CheckCircle className="h-4 w-4 text-green-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-400">{stats.approved}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-900 border-slate-800">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-400">
+              Pending Review
+            </CardTitle>
+            <TrendingUp className="h-4 w-4 text-yellow-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-yellow-400">{stats.pending}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-900 border-slate-800">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-400">
+              High Risk
+            </CardTitle>
+            <AlertTriangle className="h-4 w-4 text-red-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-400">{stats.highRisk}</div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card className="bg-slate-900 border-slate-800">
         <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by reference, customer name..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            <Select
-              value={status}
-              onValueChange={(value) => setStatus(value || "")}
-            >
-              <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-                <SelectItem value="under_review">Under Review</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <TransactionFilters
+            search={search}
+            onSearchChange={setSearch}
+            status={status}
+            onStatusChange={setStatus}
+          />
         </CardContent>
       </Card>
 
-      {/* Table */}
-      <Card>
+      {/* Transaction List */}
+      <Card className="bg-slate-900 border-slate-800">
         <CardHeader>
-          <CardTitle>
-            {data?.count || 0} Transaction{data?.count !== 1 ? "s" : ""}
+          <CardTitle className="text-white">
+            {isLoading ? "Loading..." : `${data?.results.length || 0} Transactions`}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="rounded-md border overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Reference</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Risk Score</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading || isFetching ? (
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <TableRow key={i}>
-                      {Array.from({ length: 8 }).map((_, j) => (
-                        <TableCell key={j}>
-                          <Skeleton className="h-4 w-full" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : data?.results.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8">
-                      <p className="text-muted-foreground">
-                        No transactions found
-                      </p>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  data?.results.map((transaction) => (
-                    <TableRow key={transaction.id}>
-                      <TableCell className="font-mono text-sm">
-                        {transaction.transaction_reference}
-                      </TableCell>
-                      <TableCell>{transaction.customer_name}</TableCell>
-                      <TableCell className="capitalize">
-                        {transaction.transaction_type}
-                      </TableCell>
-                      <TableCell className="font-semibold whitespace-nowrap">
-                        {transaction.currency}{" "}
-                        {parseFloat(transaction.amount).toLocaleString()}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className={getStatusColor(transaction.status)}
-                        >
-                          {transaction.status.replace("_", " ")}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className={`font-semibold ${getRiskColor(
-                            transaction.risk_score
-                          )}`}
-                        >
-                          {transaction.risk_score}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
-                        {formatDate(transaction.created_at)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setSelectedTransaction(transaction)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Pagination */}
-          {data && totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
-              <p className="text-sm text-muted-foreground">
-                Showing {(page - 1) * 20 + 1} to{" "}
-                {Math.min(page * 20, data.count)} of {data.count} results
-              </p>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setPage(page - 1)}
-                  disabled={!data.previous}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <span className="text-sm">
-                  Page {page} of {totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setPage(page + 1)}
-                  disabled={!data.next}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
+        <CardContent className="space-y-4">
+          <TransactionList
+            transactions={data?.results}
+            isLoading={isLoading}
+            onViewDetails={setSelectedTransaction}
+          />
+          <TransactionPagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
         </CardContent>
       </Card>
 
-      {/* Transaction Detail Dialog */}
-      <Dialog
+      {/* Dialogs */}
+      <CreateTransactionDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+      />
+      <TransactionDetailsDialog
+        transaction={selectedTransaction}
         open={!!selectedTransaction}
-        onOpenChange={() => setSelectedTransaction(null)}
-      >
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Transaction Details</DialogTitle>
-            <DialogDescription>
-              {selectedTransaction?.transaction_reference}
-            </DialogDescription>
-          </DialogHeader>
-          {selectedTransaction && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Customer</p>
-                  <p className="font-medium">{selectedTransaction.customer_name}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Amount</p>
-                  <p className="font-semibold">
-                    {selectedTransaction.currency}{" "}
-                    {parseFloat(selectedTransaction.amount).toLocaleString()}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Type</p>
-                  <p className="capitalize">{selectedTransaction.transaction_type}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Status</p>
-                  <Badge
-                    variant="outline"
-                    className={getStatusColor(selectedTransaction.status)}
-                  >
-                    {selectedTransaction.status.replace("_", " ")}
-                  </Badge>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Risk Score</p>
-                  <p
-                    className={`font-semibold ${getRiskColor(
-                      selectedTransaction.risk_score
-                    )}`}
-                  >
-                    {selectedTransaction.risk_score} / 100
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Created</p>
-                  <p className="text-sm">
-                    {formatDetailDate(selectedTransaction.created_at)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+        onOpenChange={(open) => !open && setSelectedTransaction(null)}
+      />
     </div>
   )
 }

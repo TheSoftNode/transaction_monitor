@@ -25,6 +25,35 @@ export const customersApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Customer"],
     }),
+    updateCustomer: builder.mutation<
+      Customer,
+      { id: string; data: Partial<Customer> }
+    >({
+      query: ({ id, data }) => ({
+        url: `/customers/${id}/`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["Customer"],
+    }),
+    patchCustomer: builder.mutation<
+      Customer,
+      { id: string; data: Partial<Customer> }
+    >({
+      query: ({ id, data }) => ({
+        url: `/customers/${id}/`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["Customer"],
+    }),
+    deleteCustomer: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/customers/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Customer"],
+    }),
   }),
 })
 
@@ -32,4 +61,7 @@ export const {
   useGetCustomersQuery,
   useGetCustomerQuery,
   useCreateCustomerMutation,
+  useUpdateCustomerMutation,
+  usePatchCustomerMutation,
+  useDeleteCustomerMutation,
 } = customersApi
