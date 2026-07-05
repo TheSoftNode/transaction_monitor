@@ -15,7 +15,7 @@ export default function SplashPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Header */}
       <header className="absolute top-0 w-full z-50 border-b border-white/10">
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+        <div className="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
           <Link href="/">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -25,10 +25,10 @@ export default function SplashPage() {
               <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-violet-500 rounded-lg flex items-center justify-center">
                 <ShieldCheck className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">SecureGuard</span>
+              <span className="text-lg sm:text-xl font-bold text-white">SecureGuard</span>
             </motion.div>
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {!isLoading && (
               <>
                 {isAuthenticated && user ? (
@@ -36,11 +36,15 @@ export default function SplashPage() {
                 ) : (
                   <>
                     <Link href="/auth/login">
-                      <Button variant="ghost" className="text-slate-300 hover:text-white">Sign In</Button>
+                      <Button variant="ghost" className="text-slate-300 hover:text-white text-sm sm:text-base px-2 sm:px-4">
+                        Sign In
+                      </Button>
                     </Link>
                     <Link href="/auth/register">
-                      <Button className="bg-violet-600 hover:bg-violet-700 text-white">
-                        Get Started <ArrowRight className="ml-2 h-4 w-4" />
+                      <Button className="bg-violet-600 hover:bg-violet-700 text-white text-sm sm:text-base px-3 sm:px-4">
+                        <span className="hidden sm:inline">Get Started</span>
+                        <span className="sm:hidden">Start</span>
+                        <ArrowRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                     </Link>
                   </>
