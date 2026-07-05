@@ -90,7 +90,7 @@ export interface Alert {
   rule_name: string
   severity: "low" | "medium" | "high" | "critical"
   message: string
-  status: "active" | "resolved" | "false_positive"
+  status: "open" | "investigating" | "resolved" | "false_positive"
   resolved_by?: string
   resolved_by_username?: string
   triggered_at: string
@@ -103,7 +103,7 @@ export interface AlertListItem {
   transaction_reference: string
   rule_name: string
   severity: "low" | "medium" | "high" | "critical"
-  status: "active" | "resolved" | "false_positive"
+  status: "open" | "investigating" | "resolved" | "false_positive"
   triggered_at: string
 }
 

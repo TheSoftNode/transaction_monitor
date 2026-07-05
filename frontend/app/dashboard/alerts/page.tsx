@@ -31,7 +31,7 @@ export default function AlertsPage() {
   const stats = data?.results.reduce(
     (acc, a) => {
       acc.total++
-      if (a.status === "active") acc.active++
+      if (a.status === "open" || a.status === "investigating") acc.active++
       if (a.severity === "critical") acc.critical++
       if (a.status === "resolved") acc.resolved++
       return acc

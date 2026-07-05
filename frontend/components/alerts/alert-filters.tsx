@@ -56,7 +56,8 @@ export function AlertFilters({
         </SelectTrigger>
         <SelectContent className="bg-slate-800 border-slate-700">
           <SelectItem value="all" className="text-white">All Status</SelectItem>
-          <SelectItem value="active" className="text-white">Active</SelectItem>
+          <SelectItem value="open" className="text-white">Open</SelectItem>
+          <SelectItem value="investigating" className="text-white">Investigating</SelectItem>
           <SelectItem value="resolved" className="text-white">Resolved</SelectItem>
           <SelectItem value="false_positive" className="text-white">False Positive</SelectItem>
         </SelectContent>

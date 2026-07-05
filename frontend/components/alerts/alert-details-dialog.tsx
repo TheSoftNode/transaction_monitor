@@ -162,7 +162,7 @@ export function AlertDetailsDialog({
           </div>
 
           {/* Resolve Actions */}
-          {alert.status === "active" && (
+          {(alert.status === "open" || alert.status === "investigating") && (
             <div className="border-t border-slate-800 pt-4 space-y-4">
               <Label className="text-slate-300">Resolve Alert</Label>
               <div className="flex gap-3">
