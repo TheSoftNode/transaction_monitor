@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { Eye, Shield, AlertCircle, Pencil, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -11,6 +12,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import type { Customer } from "@/types"
 import { useDeleteCustomerMutation } from "@/features/customers/api/customersApi"
@@ -26,18 +35,14 @@ interface CustomerListProps {
 
 export function CustomerList({ customers, isLoading, onViewDetails, onEdit }: CustomerListProps) {
   const [deleteCustomer, { isLoading: isDeleting }] = useDeleteCustomerMutation()
+  const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null)
 
-  const handleDelete = async (customer: Customer) => {
-    if (
-      !window.confirm(
-        `Delete customer "${customer.full_name}" (${customer.customer_reference})? This cannot be undone.`
-      )
-    ) {
-      return
-    }
+  const confirmDelete = async () => {
+    if (!customerToDelete) return
     try {
-      await deleteCustomer(customer.id).unwrap()
+      await deleteCustomer(customerToDelete.id).unwrap()
       toast.success("Customer deleted")
+      setCustomerToDelete(null)
     } catch (error: any) {
       toast.error(error?.data?.detail || "Failed to delete customer")
     }
@@ -82,8 +87,9 @@ export function CustomerList({ customers, isLoading, onViewDetails, onEdit }: Cu
   }
 
   return (
-    <div className="rounded-lg border border-slate-800 overflow-hidden">
-      <Table>
+    <>
+      <div className="rounded-lg border border-slate-800 overflow-hidden">
+        <Table>
         <TableHeader>
           <TableRow className="bg-slate-800/50 hover:bg-slate-800/50 border-slate-700">
             <TableHead className="text-slate-300">Reference</TableHead>
@@ -157,8 +163,7 @@ export function CustomerList({ customers, isLoading, onViewDetails, onEdit }: Cu
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleDelete(customer)}
-                    disabled={isDeleting}
+                    onClick={() => setCustomerToDelete(customer)}
                     aria-label="Delete customer"
                     className="text-slate-400 hover:text-red-400 hover:bg-slate-700"
                   >
@@ -170,6 +175,53 @@ export function CustomerList({ customers, isLoading, onViewDetails, onEdit }: Cu
           ))}
         </TableBody>
       </Table>
-    </div>
+      </div>
+
+      <Dialog
+        open={!!customerToDelete}
+        onOpenChange={(open) => !open && setCustomerToDelete(null)}
+      >
+        <DialogContent className="bg-slate-900 border-slate-800 text-white sm:max-w-[440px]">
+          <DialogHeader>
+            <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10">
+              <Trash2 className="h-6 w-6 text-red-400" />
+            </div>
+            <DialogTitle className="text-center text-white">
+              Delete customer?
+            </DialogTitle>
+            <DialogDescription className="text-center text-slate-400">
+              This will permanently delete{" "}
+              <span className="font-medium text-white">
+                {customerToDelete?.full_name}
+              </span>{" "}
+              (
+              <span className="font-mono">
+                {customerToDelete?.customer_reference}
+              </span>
+              ) and cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setCustomerToDelete(null)}
+              disabled={isDeleting}
+              className="border-slate-700 text-slate-300 hover:bg-slate-800"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={confirmDelete}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
