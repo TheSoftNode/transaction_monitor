@@ -1,7 +1,7 @@
 "use client"
 
+import Link from "next/link"
 import { Eye } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
   Table,
@@ -18,13 +18,11 @@ import { cn } from "@/lib/utils"
 interface TransactionListProps {
   transactions?: TransactionListItem[]
   isLoading: boolean
-  onViewDetails: (transaction: TransactionListItem) => void
 }
 
 export function TransactionList({
   transactions,
   isLoading,
-  onViewDetails,
 }: TransactionListProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -125,14 +123,13 @@ export function TransactionList({
                 {formatDate(transaction.created_at)}
               </TableCell>
               <TableCell className="text-right">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onViewDetails(transaction)}
-                  className="text-slate-400 hover:text-white hover:bg-slate-700"
+                <Link
+                  href={`/dashboard/transactions/${transaction.id}`}
+                  aria-label="View transaction details"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-400 hover:text-white hover:bg-slate-700"
                 >
                   <Eye className="h-4 w-4" />
-                </Button>
+                </Link>
               </TableCell>
             </TableRow>
           ))}

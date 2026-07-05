@@ -8,16 +8,13 @@ import { TransactionFilters } from "@/components/transactions/transaction-filter
 import { TransactionList } from "@/components/transactions/transaction-list"
 import { TransactionPagination } from "@/components/transactions/transaction-pagination"
 import { CreateTransactionDialog } from "@/components/transactions/create-transaction-dialog"
-import { TransactionDetailsDialog } from "@/components/transactions/transaction-details-dialog"
 import { useGetTransactionsQuery } from "@/features/transactions/api/transactionsApi"
-import type { TransactionListItem } from "@/types"
 
 export default function TransactionsPage() {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState("")
   const [status, setStatus] = useState("all")
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
-  const [selectedTransaction, setSelectedTransaction] = useState<TransactionListItem | null>(null)
 
   const { data, isLoading } = useGetTransactionsQuery({
     page,
@@ -133,7 +130,6 @@ export default function TransactionsPage() {
           <TransactionList
             transactions={data?.results}
             isLoading={isLoading}
-            onViewDetails={setSelectedTransaction}
           />
           <TransactionPagination
             currentPage={page}
@@ -147,11 +143,6 @@ export default function TransactionsPage() {
       <CreateTransactionDialog
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
-      />
-      <TransactionDetailsDialog
-        transaction={selectedTransaction}
-        open={!!selectedTransaction}
-        onOpenChange={(open) => !open && setSelectedTransaction(null)}
       />
     </div>
   )
