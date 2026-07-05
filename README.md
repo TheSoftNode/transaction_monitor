@@ -22,6 +22,7 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 - [Frontend Dashboard](#frontend-dashboard)
 - [Project Structure](#project-structure)
 - [API Documentation](#api-documentation)
+- [Risk Scoring](#risk-scoring)
 - [Testing](#testing)
 - [Production Deployment](#production-deployment)
 - [Design Decisions](#design-decisions)
@@ -653,6 +654,54 @@ Authorization: Bearer YOUR_TOKEN
   "processed_at": "2024-07-04T10:00:01Z"
 }
 ```
+
+---
+
+## 🎯 Risk Scoring
+
+Every transaction receives a **risk score (0–100)**. The **Rust scorer** computes the authoritative score (with graceful fallback to the Python engine if it is unavailable), while the **Python rule engine** always runs to generate **alerts** and **audit logs**.
+
+### Scoring factors
+
+The score is the sum of the factors below, capped at 100:
+
+| Factor | Points |
+|--------|--------|
+| Amount ≥ $1,000,000 | +50 |
+| Amount ≥ $100,000 | +40 |
+| Amount ≥ $10,000 | +25 |
+| Amount > $5,000 | +15 |
+| High-risk country (IRN, PRK, SYR, SDN) | +30 |
+| Blacklisted customer | +40 |
+| High-risk customer | +25 |
+| Medium-risk customer | +10 |
+| Withdrawal transaction | +10 |
+
+> Amount scoring is **graduated** — larger transactions score higher (up to +50), instead of a flat value.
+
+### Risk levels
+
+| Score | Level |
+|-------|-------|
+| 0–25 | Low |
+| 26–50 | Medium |
+| 51–75 | High |
+| 76–100 | Critical |
+
+The dashboard's **"High Risk"** stat counts transactions scoring **≥ 70**.
+
+### Examples
+
+| Transaction | Score |
+|-------------|-------|
+| $500 deposit — low-risk US customer | 0 |
+| $10,000 deposit | 25 |
+| $150,000 deposit | 40 |
+| $10,000,000 deposit | 50 |
+| $1M deposit — blacklisted customer | 90 |
+| $100k transfer from a high-risk country | 70 |
+
+> Because the amount factor alone caps at 50, a transaction only becomes **High Risk (≥ 70)** when factors **stack** — e.g. a large amount **plus** a blacklisted/high-risk customer or a high-risk country.
 
 ---
 
