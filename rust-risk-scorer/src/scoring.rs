@@ -16,7 +16,9 @@ const BLACKLIST_SCORE: u8 = 40;
 const WITHDRAWAL_SCORE: u8 = 10;
 const MAX_RISK_SCORE: u8 = 100;
 
-static HIGH_RISK_COUNTRIES: &[&str] = &["IRN", "PRK", "SYR", "SDN"];
+// ISO 3166-1 alpha-2 codes, aligned with the Python BlacklistedCountryRule
+// and the frontend's 2-letter country_code input.
+static HIGH_RISK_COUNTRIES: &[&str] = &["KP", "IR", "SY", "CU", "VE"];
 
 pub struct RiskScorer;
 
