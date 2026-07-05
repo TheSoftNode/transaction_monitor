@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ShieldCheck, ArrowRight } from "lucide-react"
+import { ShieldCheck, ArrowRight, Github } from "lucide-react"
 import { DashboardPreview } from "@/components/dashboard-preview"
 import { ProfileDropdown } from "@/components/profile-dropdown"
 import { useAuth } from "@/hooks/useAuth"
@@ -97,16 +97,37 @@ export default function SplashPage() {
                   transition={{ delay: 0.4 }}
                   className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start"
                 >
-                  <Link href="/auth/register">
-                    <Button className="bg-violet-600 hover:bg-violet-700 text-white px-6 w-full sm:w-auto">
-                      Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                  <Link href="/auth/login">
-                    <Button variant="outline" className="text-slate-300 border-slate-700 hover:bg-slate-800 px-6 w-full sm:w-auto">
-                      Sign In
-                    </Button>
-                  </Link>
+                  {isAuthenticated ? (
+                    <>
+                      <Link href="/dashboard/transactions">
+                        <Button className="bg-violet-600 hover:bg-violet-700 text-white px-6 w-full sm:w-auto">
+                          Go to Dashboard <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </Link>
+                      <a
+                        href="https://github.com/TheSoftNode/transaction_monitor"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button variant="outline" className="text-slate-300 border-slate-700 hover:bg-slate-800 px-6 w-full sm:w-auto">
+                          <Github className="mr-2 h-4 w-4" /> GitHub
+                        </Button>
+                      </a>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/auth/register">
+                        <Button className="bg-violet-600 hover:bg-violet-700 text-white px-6 w-full sm:w-auto">
+                          Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </Link>
+                      <Link href="/auth/login">
+                        <Button variant="outline" className="text-slate-300 border-slate-700 hover:bg-slate-800 px-6 w-full sm:w-auto">
+                          Sign In
+                        </Button>
+                      </Link>
+                    </>
+                  )}
                 </motion.div>
               </div>
             </div>
