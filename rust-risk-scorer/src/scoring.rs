@@ -1,8 +1,12 @@
 use crate::models::{RiskLevel, RiskScore, Transaction};
 use std::time::Instant;
 
-const HIGH_VALUE_THRESHOLD: f64 = 10000.0;
-const MEDIUM_VALUE_THRESHOLD: f64 = 5000.0;
+const VERY_HIGH_VALUE_THRESHOLD: f64 = 1_000_000.0;
+const LARGE_VALUE_THRESHOLD: f64 = 100_000.0;
+const HIGH_VALUE_THRESHOLD: f64 = 10_000.0;
+const MEDIUM_VALUE_THRESHOLD: f64 = 5_000.0;
+const VERY_HIGH_VALUE_SCORE: u8 = 50;
+const LARGE_VALUE_SCORE: u8 = 40;
 const HIGH_VALUE_SCORE: u8 = 25;
 const MEDIUM_VALUE_SCORE: u8 = 15;
 const HIGH_RISK_COUNTRY_SCORE: u8 = 30;
@@ -46,7 +50,13 @@ impl RiskScorer {
     }
 
     fn evaluate_amount(&self, txn: &Transaction, score: &mut u8, factors: &mut Vec<String>) {
-        if txn.amount > HIGH_VALUE_THRESHOLD {
+        if txn.amount >= VERY_HIGH_VALUE_THRESHOLD {
+            *score += VERY_HIGH_VALUE_SCORE;
+            factors.push(format!("Very high value: ${:.2}", txn.amount));
+        } else if txn.amount >= LARGE_VALUE_THRESHOLD {
+            *score += LARGE_VALUE_SCORE;
+            factors.push(format!("Large value: ${:.2}", txn.amount));
+        } else if txn.amount >= HIGH_VALUE_THRESHOLD {
             *score += HIGH_VALUE_SCORE;
             factors.push(format!("High value: ${:.2}", txn.amount));
         } else if txn.amount > MEDIUM_VALUE_THRESHOLD {
@@ -83,7 +93,12 @@ impl RiskScorer {
         }
     }
 
-    fn evaluate_transaction_type(&self, txn: &Transaction, score: &mut u8, factors: &mut Vec<String>) {
+    fn evaluate_transaction_type(
+        &self,
+        txn: &Transaction,
+        score: &mut u8,
+        factors: &mut Vec<String>,
+    ) {
         if txn.transaction_type == "withdrawal" {
             *score += WITHDRAWAL_SCORE;
             factors.push("Withdrawal transaction".to_string());
@@ -126,6 +141,27 @@ mod tests {
         let result = scorer.calculate(&txn);
 
         assert!(result.risk_score >= 25);
+    }
+
+    #[test]
+    fn test_amount_tiers_are_graduated() {
+        let scorer = RiskScorer::new();
+
+        let mut high = create_test_transaction();
+        high.amount = 15_000.0;
+
+        let mut large = create_test_transaction();
+        large.amount = 150_000.0;
+
+        let mut very_high = create_test_transaction();
+        very_high.amount = 2_000_000.0;
+
+        let high_score = scorer.calculate(&high).risk_score;
+        let large_score = scorer.calculate(&large).risk_score;
+        let very_high_score = scorer.calculate(&very_high).risk_score;
+
+        assert!(high_score < large_score);
+        assert!(large_score < very_high_score);
     }
 
     #[test]
