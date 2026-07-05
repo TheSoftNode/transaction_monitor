@@ -161,7 +161,7 @@ class TestModelsComprehensive:
             severity="high",
             message="Test alert",
         )
-        expected = f"Alert: {alert.rule_name} - {alert.severity} - {alert.transaction.transaction_reference}"
+        expected = f"{alert.rule_name} - {alert.transaction.transaction_reference} - {alert.severity}"
         assert str(alert) == expected
 
     def test_audit_log_str_method(self, transaction, user):

@@ -81,11 +81,13 @@ class TestAlertViewsExtended:
             rule_name="TestRule",
             severity="medium",
             message="Test alert",
-            status="active",
+            status="open",
         )
 
         url = reverse("alerts:alert-resolve", kwargs={"pk": alert.id})
-        response = authenticated_client.post(url)
+        response = authenticated_client.post(
+            url, {"status": "resolved", "is_false_positive": False}, format="json"
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data["status"] == "resolved"

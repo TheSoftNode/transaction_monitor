@@ -90,7 +90,9 @@ class TestTransactionAPI:
         response = authenticated_client.get(url, {"customer": str(customer.id)})
 
         assert response.status_code == status.HTTP_200_OK
-        assert all(str(t["customer"]) == str(customer.id) for t in response.data["results"])
+        assert all(
+            str(t["customer"]) == str(customer.id) for t in response.data["results"]
+        )
 
     def test_search_transactions(self, authenticated_client, transaction):
         """Test searching transactions"""
