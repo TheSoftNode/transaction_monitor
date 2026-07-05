@@ -1,5 +1,5 @@
 // API Base URL
-export const API_URL = "http://40.127.13.42:8000/api/v1"
+export const API_URL = "https://safeguard.urisocial.com/api/v1"
 
 // Auth types
 export interface User {
