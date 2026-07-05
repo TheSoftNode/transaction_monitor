@@ -259,14 +259,14 @@ class TestViewsMissingLines:
 class TestBaseRuleMissingLines:
     """Test missing abstract methods in BaseRule"""
 
-    def test_base_rule_risk_score_impact(self):
+    def test_base_rule_risk_score_impact(self, transaction):
         """Test default risk score impact calculation"""
         from rules.plugins.high_value import HighValueTransactionRule
 
         rule = HighValueTransactionRule()
 
         # Test severity to score mapping
-        impact = rule.get_risk_score_impact()
+        impact = rule.get_risk_score_impact(transaction)
         assert isinstance(impact, int)
         assert impact > 0
 

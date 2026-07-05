@@ -16,7 +16,7 @@ class BlacklistedCountryRule(BaseRule):
     def evaluate(self, transaction: Transaction) -> bool:
         return transaction.customer.country_code.upper() in self.blacklisted_countries
 
-    def get_severity(self) -> str:
+    def get_severity(self, transaction: Transaction) -> str:
         return "critical"
 
     def get_message(self, transaction: Transaction) -> str:

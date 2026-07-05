@@ -38,7 +38,7 @@ class TestRuleEngine:
         triggered = rule.evaluate(transaction)
 
         assert triggered is True
-        assert rule.get_severity() in ["medium", "high", "critical"]
+        assert rule.get_severity(transaction) in ["medium", "high", "critical"]
 
     def test_high_value_transaction_rule_not_triggered(self, customer):
         """Test high value rule not triggered for small transaction"""

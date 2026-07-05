@@ -20,7 +20,7 @@ class BaseRule(ABC):
         pass
 
     @abstractmethod
-    def get_severity(self) -> str:
+    def get_severity(self, transaction: "Transaction") -> str:
         """
         Return the severity level: 'low', 'medium', 'high', or 'critical'
         """
@@ -33,7 +33,7 @@ class BaseRule(ABC):
         """
         pass
 
-    def get_risk_score_impact(self) -> int:
+    def get_risk_score_impact(self, transaction: "Transaction") -> int:
         """
         Return the risk score impact (0-100) when this rule is triggered.
         """
@@ -43,4 +43,4 @@ class BaseRule(ABC):
             "high": 50,
             "critical": 75,
         }
-        return severity_scores.get(self.get_severity(), 10)
+        return severity_scores.get(self.get_severity(transaction), 10)

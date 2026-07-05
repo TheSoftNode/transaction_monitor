@@ -16,16 +16,14 @@ class HighValueTransactionRule(BaseRule):
     def evaluate(self, transaction: Transaction) -> bool:
         return transaction.amount > self.threshold
 
-    def get_severity(self) -> str:
-        if transaction_amount := getattr(self, "_current_transaction_amount", None):
-            if transaction_amount > self.threshold * 5:
-                return "critical"
-            elif transaction_amount > self.threshold * 2:
-                return "high"
+    def get_severity(self, transaction: Transaction) -> str:
+        if transaction.amount > self.threshold * 5:
+            return "critical"
+        elif transaction.amount > self.threshold * 2:
+            return "high"
         return "medium"
 
     def get_message(self, transaction: Transaction) -> str:
-        self._current_transaction_amount = transaction.amount
         return (
             f"High value transaction detected: {transaction.amount} {transaction.currency} "
             f"exceeds threshold of {self.threshold}"

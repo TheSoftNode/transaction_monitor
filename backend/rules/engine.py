@@ -56,12 +56,12 @@ class RuleEngine:
                     triggered_rules.append(
                         {
                             "rule": rule,
-                            "severity": rule.get_severity(),
+                            "severity": rule.get_severity(transaction),
                             "message": rule.get_message(transaction),
-                            "risk_impact": rule.get_risk_score_impact(),
+                            "risk_impact": rule.get_risk_score_impact(transaction),
                         }
                     )
-                    total_risk_score += rule.get_risk_score_impact()
+                    total_risk_score += rule.get_risk_score_impact(transaction)
                     logger.info(
                         f"Rule triggered: {rule.name} for transaction {transaction.transaction_reference}"
                     )

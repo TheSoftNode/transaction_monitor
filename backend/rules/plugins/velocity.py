@@ -25,7 +25,7 @@ class VelocityRule(BaseRule):
 
         return recent_transactions > self.max_transactions
 
-    def get_severity(self) -> str:
+    def get_severity(self, transaction: Transaction) -> str:
         return "high"
 
     def get_message(self, transaction: Transaction) -> str:

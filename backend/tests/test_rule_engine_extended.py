@@ -174,15 +174,29 @@ class TestRuleEngineExtended:
 
     def test_high_risk_customer_rule_severity(self, blacklisted_customer):
         """Test HighRiskCustomerRule severity level"""
+        transaction = Transaction.objects.create(
+            transaction_reference="TXN_BLACKLIST_SEV",
+            customer=blacklisted_customer,
+            amount=Decimal("100.00"),
+            currency="USD",
+            transaction_type="deposit",
+        )
         rule = HighRiskCustomerRule()
-        severity = rule.get_severity()
+        severity = rule.get_severity(transaction)
 
-        assert severity in ["low", "medium", "high", "critical"]
+        assert severity == "critical"
 
     def test_risk_score_impact(self, customer):
         """Test risk score impact calculation"""
+        transaction = Transaction.objects.create(
+            transaction_reference="TXN_IMPACT",
+            customer=customer,
+            amount=Decimal("15000.00"),
+            currency="USD",
+            transaction_type="deposit",
+        )
         rule = HighValueTransactionRule()
-        impact = rule.get_risk_score_impact()
+        impact = rule.get_risk_score_impact(transaction)
 
         assert isinstance(impact, int)
         assert 0 <= impact <= 100
