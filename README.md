@@ -2,10 +2,14 @@
 
 A production-grade transaction monitoring platform with real-time risk assessment, event-driven architecture, and ML-powered anomaly detection.
 
-[![Test Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)]()
+[![Test Coverage](https://img.shields.io/badge/coverage-70%25-brightgreen)]()
 [![Python](https://img.shields.io/badge/python-3.12-blue)]()
 [![Django](https://img.shields.io/badge/django-5.0-green)]()
+[![Next.js](https://img.shields.io/badge/next.js-16-black)]()
+[![Rust](https://img.shields.io/badge/rust-scorer-orange)]()
 [![License](https://img.shields.io/badge/license-MIT-blue)]()
+
+**Live demo:** Frontend → https://transaction-monitor-nu.vercel.app · API (HTTPS) → https://safeguard.urisocial.com · Swagger → https://safeguard.urisocial.com/api/schema/swagger-ui/
 
 ---
 
@@ -15,6 +19,7 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 - [Architecture Overview](#architecture-overview)
 - [Technology Stack](#technology-stack)
 - [Quick Start](#quick-start)
+- [Frontend Dashboard](#frontend-dashboard)
 - [Project Structure](#project-structure)
 - [API Documentation](#api-documentation)
 - [Testing](#testing)
@@ -30,6 +35,7 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 ### Core Functionality
 
 #### Backend API
+
 - **RESTful API** with Django REST Framework
 - **JWT Authentication** for secure access
 - **Customer Management**: Create, list, and manage customers
@@ -41,20 +47,21 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 - **Proper Error Handling**: Structured error responses with request tracking
 
 #### Rule Engine
+
 - **Extensible Architecture**: Plugin-based rule system using Registry pattern
-- **Dynamic Rule Loading**: Database-driven rule configuration
-- **Pre-built Rules**:
-  - High Amount Rule (>$10,000)
-  - Frequency Rule (>5 transactions/hour)
-  - Blacklisted Country Rule
-  - High-Risk Customer Rule
-  - Velocity Rule (rapid successive transactions)
+- **Dynamic Rule Loading**: Database-driven rule configuration (`RuleConfiguration`)
+- **Pre-built Rules** (in `rules/plugins/`):
+  - `HighValueTransactionRule` — transaction amount above a threshold (default $10,000)
+  - `VelocityRule` — more than N transactions within a time window (default >5 / 1 hour)
+  - `BlacklistedCountryRule` — customer country in a blacklist (KP, IR, SY, CU, VE)
+  - `HighRiskCustomerRule` — high-risk or blacklisted customer
 - **Risk Scoring**: Automatic risk score calculation (0-100)
 - **Alert Generation**: Create alerts when rules trigger
 - **Audit Logging**: Complete audit trail of all rule evaluations
 - **Easy Extension**: Add new rules by extending `BaseRule` class
 
 #### Event-Driven Architecture
+
 - **Apache Kafka**: Production-grade message broker
 - **Async Processing**: Independent event processor service
 - **Transaction Events**: Publish `transaction.created` events
@@ -63,6 +70,7 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 - **Fault Tolerance**: Graceful degradation and error handling
 
 #### Production Readiness
+
 - **Structured Logging**: JSON logging with request IDs for traceability
 - **Health Endpoint**: `/health/` - Database and cache health checks
 - **Metrics Endpoint**: `/metrics` - Prometheus-compatible metrics
@@ -73,6 +81,7 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 - **Centralized Configuration**: Environment-based settings management
 
 #### DevOps & Deployment
+
 - **Docker Containerization**: Multi-stage Docker builds for optimization
 - **Docker Compose**: Single-command deployment (`docker compose up`)
 - **Database Migrations**: Automated Django migrations
@@ -81,8 +90,9 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 - **Production Scripts**: Health checks, deployment automation
 
 #### Testing
-- **97% Code Coverage**: Comprehensive test suite
-- **99 Tests**: Covering all critical paths
+
+- **70%+ Code Coverage**: Enforced as a CI gate (`--cov-fail-under=70`)
+- **123 Tests**: Covering all critical paths
 - **Unit Tests**: Individual component testing
 - **Integration Tests**: End-to-end workflow validation
 - **API Tests**: All endpoints with various scenarios
@@ -93,24 +103,28 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 ### Advanced Features
 
 #### Rust Microservice
+
 - **High-Performance Risk Scoring**: Rust service for performance-critical operations
 - **RESTful API**: Independent service on port 8001
 - **Docker Integration**: Seamlessly integrated with Docker Compose
 - **Health Checks**: Monitoring and observability
 
 #### CI/CD Pipeline
+
 - **GitHub Actions**: Automated testing and deployment
 - **Continuous Integration**: Run tests on every push/PR
 - **Continuous Deployment**: Auto-deploy to Azure VM on push to `main`
 - **Path-Based Triggers**: Only deploy when backend/rust code changes
 
 #### Observability
+
 - **Prometheus Integration**: Metrics collection and monitoring
 - **Grafana Dashboard**: Real-time visualization
 - **Custom Metrics**: Transaction counts, risk scores, ML predictions
 - **Alerting**: Prometheus alerting rules
 
 #### ML/AI Anomaly Detection
+
 - **Isolation Forest**: Unsupervised anomaly detection
 - **Feature Engineering**: Transaction amount, time, customer behavior
 - **Real-Time Scoring**: ML prediction on every transaction
@@ -119,6 +133,7 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 - **Scikit-learn**: Production ML library
 
 #### Infrastructure as Code
+
 - **Kubernetes Manifests**: Complete K8s deployment configurations
 - **Terraform**: Infrastructure provisioning (AWS-based)
 
@@ -132,8 +147,8 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 ┌─────────────────────────────────────────────────────────────────┐
 │                        Client Layer                              │
 │  ┌──────────────┐     ┌──────────────┐    ┌──────────────┐     │
-│  │   React UI   │────▶│   Swagger    │◀───│   Grafana    │     │
-│  │  (Pending)   │     │ Documentation│    │  Dashboard   │     │
+│  │  Next.js UI  │────▶│   Swagger    │◀───│   Grafana    │     │
+│  │  (Vercel)    │     │ Documentation│    │  Dashboard   │     │
 │  └──────────────┘     └──────────────┘    └──────────────┘     │
 └────────────────┬───────────────────────────────────┬────────────┘
                  │                                   │
@@ -253,6 +268,7 @@ Kafka Consumer (Event Processor)
 ## 🛠️ Technology Stack
 
 ### Backend
+
 - **Python 3.12**: Core language
 - **Django 5.0**: Web framework
 - **Django REST Framework**: API framework
@@ -262,18 +278,21 @@ Kafka Consumer (Event Processor)
 - **Gunicorn**: WSGI HTTP server
 
 ### Additional Services
+
 - **Rust**: High-performance risk scoring microservice
 - **Scikit-learn**: ML anomaly detection
 - **Prometheus**: Metrics collection
 - **Grafana**: Visualization and dashboards
 
 ### Development & Testing
+
 - **pytest**: Test framework
 - **pytest-django**: Django integration
 - **pytest-cov**: Code coverage
 - **Docker & Docker Compose**: Containerization
 
 ### DevOps
+
 - **GitHub Actions**: CI/CD
 - **Azure VM**: Production hosting
 - **Kubernetes**: Orchestration manifests (prepared)
@@ -361,6 +380,40 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 
 ---
 
+## 🎨 Frontend Dashboard
+
+A responsive **Next.js 16 (React 19) + TypeScript** dashboard that consumes **only** the backend REST API.
+
+**Live:** https://transaction-monitor-nu.vercel.app
+
+### Stack
+
+- **Next.js 16** (App Router) + **React 19** + **TypeScript**
+- **Redux Toolkit + RTK Query** for data fetching, caching, and JWT token injection
+- **Tailwind CSS v4** + **shadcn/ui** components
+- **framer-motion** (animations), **recharts** (charts), **sonner** (toasts)
+
+### Features (assessment Part 4)
+
+- JWT **login & registration** pages
+- **Transactions** table with search, status filters, pagination, and a details view
+- **Customers** table
+- **Alerts** list
+- **Create Transaction** modal with a searchable **customer dropdown** — select a customer or type a reference; shows “the customer with that reference does not exist” for unknown references
+- Responsive design with loading and error states
+
+### Run locally
+
+```bash
+cd frontend
+npm install
+npm run dev            # http://localhost:3000
+```
+
+> By default the app targets the deployed HTTPS API. To use a local backend, set `API_URL` in `frontend/types/index.ts` to `http://localhost:8000/api/v1`.
+
+---
+
 ## 📁 Project Structure
 
 ```
@@ -381,10 +434,14 @@ transaction-monitor/
 │   │
 │   ├── rules/                    # Rule Engine
 │   │   ├── base.py              # BaseRule abstract class
-│   │   ├── registry.py          # Rule registry pattern
-│   │   ├── engine.py            # Rule execution engine
-│   │   ├── transaction_rules.py # Pre-built rules
-│   │   └── models.py            # Rule configuration
+│   │   ├── registry.py          # Rule registry (decorator-based)
+│   │   ├── engine.py            # Rule execution engine (+ Rust integration)
+│   │   ├── plugins/             # Pre-built rules (one file per rule)
+│   │   │   ├── high_value.py
+│   │   │   ├── velocity.py
+│   │   │   ├── geographic.py
+│   │   │   └── customer_risk.py
+│   │   └── models.py            # RuleConfiguration
 │   │
 │   ├── ml/                       # Machine Learning
 │   │   ├── anomaly_detector.py  # Isolation Forest ML model
@@ -424,12 +481,14 @@ transaction-monitor/
 │   │   │   └── test.py
 │   │   └── urls.py
 │   │
-│   ├── tests/                    # Test suite (97% coverage)
-│   │   ├── test_models.py
-│   │   ├── test_views.py
+│   ├── tests/                    # Test suite (70%+ coverage)
+│   │   ├── conftest.py          # Shared fixtures
+│   │   ├── api/                 # API tests (auth, customers, transactions)
+│   │   ├── integration/         # End-to-end workflow tests
+│   │   ├── rules/               # Rule engine tests
 │   │   ├── test_serializers.py
-│   │   ├── test_rules.py
-│   │   └── test_views_extended.py
+│   │   ├── test_views_extended.py
+│   │   └── test_monitoring.py
 │   │
 │   ├── scripts/                  # Deployment scripts
 │   │   ├── start-production.sh
@@ -447,6 +506,15 @@ transaction-monitor/
 │   ├── .env.example            # Environment template
 │   ├── manage.py
 │   └── pytest.ini
+│
+├── frontend/                    # Next.js 16 + TypeScript dashboard
+│   ├── app/                     # App Router pages
+│   │   ├── auth/                # Login / Register
+│   │   └── dashboard/           # Transactions, Customers, Alerts
+│   ├── components/              # UI components (shadcn/ui)
+│   ├── features/                # RTK Query API slices (per domain)
+│   ├── lib/redux/               # Store + base API config
+│   └── types/                   # Shared TypeScript types
 │
 ├── rust-risk-scorer/            # Rust microservice
 │   ├── src/
@@ -601,57 +669,62 @@ open backend/htmlcov/index.html
 
 ### Test Coverage
 
-**Current Coverage: 97.19%**
+**Current Coverage: ~71%** — CI enforces a minimum of **70%** via `--cov-fail-under=70`.
+
+Highlights:
 
 ```
-apps/alerts/models.py              99%
-apps/alerts/serializers.py        100%
-apps/alerts/views.py              100%
-apps/customers/models.py          100%
-apps/customers/serializers.py     100%
-apps/transactions/models.py        98%
-apps/transactions/serializers.py  100%
-apps/transactions/views.py         95%
-rules/engine.py                   100%
-rules/transaction_rules.py        100%
+rules/engine.py                    98%
+rules/plugins/*                 93-100%
+apps/alerts/{models,views}.py   97-100%
+apps/customers/*                91-100%
+apps/transactions/models.py       100%
+apps/transactions/serializers.py   93%
 ```
 
 ### Test Categories
 
 ```bash
-# API endpoint tests
-pytest tests/test_views.py -v
-
-# Model tests
-pytest tests/test_models.py -v
-
-# Serializer tests
-pytest tests/test_serializers.py -v
+# API endpoint tests (auth, customers, transactions)
+pytest tests/api/ -v
 
 # Rule engine tests
-pytest tests/test_rules.py -v
+pytest tests/rules/ -v
 
-# Integration tests
-pytest tests/test_integration.py -v
+# Integration / end-to-end workflow tests
+pytest tests/integration/ -v
+
+# Serializer & extended view tests
+pytest tests/test_serializers.py tests/test_views_extended.py -v
 ```
 
 ---
 
 ## 🌐 Production Deployment
 
-### Current Deployment: Azure VM
+### Current Deployment
 
-**Production URL**: http://40.127.13.42:8000
+| Component                                 | URL                                                    |
+| ----------------------------------------- | ------------------------------------------------------ |
+| **Frontend** (Vercel)                     | https://transaction-monitor-nu.vercel.app              |
+| **API** (HTTPS via nginx + Let's Encrypt) | https://safeguard.urisocial.com                        |
+| **Swagger**                               | https://safeguard.urisocial.com/api/schema/swagger-ui/ |
 
-#### Services Running
+The backend runs on an **Azure VM (Ubuntu 24.04)** via Docker Compose. A
+containerized **nginx** reverse proxy terminates TLS (Let's Encrypt certificate,
+auto-renewed) for `safeguard.urisocial.com` and proxies to the backend on port 8000. The frontend is deployed on **Vercel** and consumes only the backend API.
 
-- ✅ Backend API (Port 8000)
+#### Services Running (Docker Compose)
+
+- ✅ Backend API (Django + Gunicorn, Port 8000)
+- ✅ Event Processor (independent Kafka consumer)
 - ✅ Rust Scorer (Port 8001)
 - ✅ PostgreSQL (Port 5432)
 - ✅ Redis (Port 6379)
-- ✅ Kafka (Port 9092)
+- ✅ Kafka + Zookeeper (Port 9092)
 - ✅ Prometheus (Port 9090)
 - ✅ Grafana (Port 3000)
+- ✅ nginx (TLS termination, Ports 80/443)
 
 #### Automated Deployment
 
@@ -682,11 +755,11 @@ docker compose -f docker-compose.prod.yml ps
 
 ### Production Monitoring
 
-- **Health**: http://40.127.13.42:8000/health/
-- **Metrics**: http://40.127.13.42:8000/metrics
+- **Health**: https://safeguard.urisocial.com/health/
+- **Metrics**: https://safeguard.urisocial.com/metrics
+- **API Docs**: https://safeguard.urisocial.com/api/schema/swagger-ui/
 - **Prometheus**: http://40.127.13.42:9090
 - **Grafana**: http://40.127.13.42:3000
-- **API Docs**: http://40.127.13.42:8000/api/schema/swagger-ui/
 
 ---
 
@@ -697,12 +770,14 @@ docker compose -f docker-compose.prod.yml ps
 **Decision**: Implement a plugin-based rule system using a registry pattern instead of hardcoding rules.
 
 **Rationale**:
+
 - **Extensibility**: New rules can be added by simply creating a new class and registering it
 - **Maintainability**: Each rule is isolated and testable independently
 - **Dynamic Configuration**: Rules can be enabled/disabled via database without code changes
 - **Priority System**: Rules execute in order of priority
 
 **Implementation**:
+
 ```python
 class BaseRule:
     def evaluate(self, transaction, customer) -> RuleResult:
@@ -719,6 +794,7 @@ class HighAmountRule(BaseRule):
 **Decision**: Use Apache Kafka for event-driven transaction processing instead of synchronous calls.
 
 **Rationale**:
+
 - **Decoupling**: API and risk processing are independent
 - **Scalability**: Event processors can scale horizontally
 - **Reliability**: Events are persisted; no data loss
@@ -729,21 +805,23 @@ class HighAmountRule(BaseRule):
 
 ### 3. **Rust Microservice for Risk Scoring**
 
-**Decision**: Implement performance-critical risk scoring in Rust as a separate microservice.
+**Decision**: Implement performance-critical risk scoring in Rust as a separate microservice, integrated with the Python rule engine.
 
 **Rationale**:
+
 - **Performance**: Rust is 10-100x faster than Python for CPU-intensive operations
 - **Concurrency**: Excellent for high-throughput scoring
 - **Type Safety**: Prevents runtime errors in critical paths
 - **Polyglot Architecture**: Best tool for each job
 
-**Integration**: REST API called by event processor
+**Integration**: The rule engine always runs the Python rules (to generate alerts + audit logs), and when the Rust scorer is enabled it supplies the **authoritative risk score** while the rule-based alerts are preserved. If Rust is unavailable, the engine gracefully falls back to the Python-computed score.
 
 ### 4. **ML Anomaly Detection (Optional Warning)**
 
 **Decision**: Integrate ML-based anomaly detection that returns warnings when untrained.
 
 **Rationale**:
+
 - **Graceful Degradation**: System works even without trained model
 - **Transparency**: Users see ML is active but needs training
 - **Flexibility**: ML can be trained when sufficient data available
@@ -756,12 +834,14 @@ class HighAmountRule(BaseRule):
 **Decision**: Separate settings files for dev, test, and production environments.
 
 **Rationale**:
+
 - **Security**: Different secrets for each environment
 - **Flexibility**: Environment-specific optimizations
 - **Safety**: Prevent production data in development
 - **Best Practice**: Industry-standard approach
 
 **Structure**:
+
 ```
 settings/
 ├── base.py        # Shared settings
@@ -775,6 +855,7 @@ settings/
 **Decision**: Version API with `/api/v1/` prefix from the start.
 
 **Rationale**:
+
 - **Future-Proofing**: Easy to add v2 without breaking existing clients
 - **Best Practice**: RESTful API standard
 - **Client Stability**: Older clients continue working when new version released
@@ -784,6 +865,7 @@ settings/
 **Decision**: Use PostgreSQL as primary database instead of NoSQL alternatives.
 
 **Rationale**:
+
 - **ACID Compliance**: Financial data requires strong consistency
 - **Complex Queries**: Support for joins, aggregations, filtering
 - **Proven Reliability**: Battle-tested for transactional systems
@@ -794,6 +876,7 @@ settings/
 **Decision**: Use Docker Compose instead of requiring local installs.
 
 **Rationale**:
+
 - **Consistency**: Same environment for all developers
 - **Simplicity**: `docker compose up` starts everything
 - **Isolation**: No conflicts with local system
@@ -823,9 +906,9 @@ We have full Kubernetes manifests and Terraform configs ready, but chose Docker 
 
 The Rust service adds another moving part to maintain, but it's 10-100x faster than Python for risk calculations. Worth it for performance-critical operations, especially under high load.
 
-### 6. **Frontend Not Included**
+### 6. **Next.js Frontend Consuming Only the API**
 
-Backend-first approach. The API is fully documented with Swagger, and a frontend can be added independently without touching the backend.
+The dashboard is a separate Next.js app (deployed on Vercel) that consumes only the backend REST API — no shared code or direct database access. This keeps a clean separation, lets frontend and backend deploy/scale independently, and makes the Swagger-documented API contract the single integration point. The trade-off is that browser calls from the HTTPS frontend require the backend to be served over HTTPS too (handled by the nginx + Let's Encrypt proxy) and CORS must be configured.
 
 ---
 
@@ -943,6 +1026,7 @@ curl http://localhost:8001/health
 ### Grafana Dashboard
 
 Pre-configured dashboard includes:
+
 - Transaction volume over time
 - Risk score distribution
 - ML anomaly detection rate
@@ -968,6 +1052,7 @@ Pre-configured dashboard includes:
 ## 🚧 Roadmap
 
 ### Completed ✅
+
 - Backend API with all endpoints
 - Rule engine with 5 pre-built rules
 - Event-driven architecture with Kafka
@@ -980,9 +1065,11 @@ Pre-configured dashboard includes:
 - Production deployment on Azure
 
 ### In Progress 🚧
+
 - Frontend Dashboard (React + TypeScript)
 
 ### Planned 📋
+
 - WebSocket support for real-time updates
 - Mobile app (React Native)
 - Advanced ML models (Neural networks)
