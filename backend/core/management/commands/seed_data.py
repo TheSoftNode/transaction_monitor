@@ -103,7 +103,7 @@ class Command(BaseCommand):
             admin_user.save()
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"✓ Admin user created: username=admin, password=admin123"
+                    "✓ Admin user created: username=admin, password=admin123"
                 )
             )
         else:

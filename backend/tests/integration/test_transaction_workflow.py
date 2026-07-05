@@ -90,8 +90,6 @@ class TestTransactionWorkflow:
         self, authenticated_client, transaction
     ):
         """Test that updating transaction status creates audit log"""
-        initial_log_count = AuditLog.objects.count()
-
         url = reverse(
             "transactions:transaction-update-status", kwargs={"pk": transaction.id}
         )
