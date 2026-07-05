@@ -1,1 +1,1 @@
-from django.db import models
+# Placeholder for monitoring models if needed

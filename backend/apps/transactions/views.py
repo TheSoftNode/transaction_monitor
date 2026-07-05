@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db import models
 from django_filters.rest_framework import DjangoFilterBackend
 from prometheus_client import Counter
-from rest_framework import filters, status, viewsets
+from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 

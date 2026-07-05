@@ -2,15 +2,12 @@
 Comprehensive tests to achieve 95%+ coverage
 """
 
-from datetime import timedelta
 from decimal import Decimal
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
-from django.utils import timezone
 
 from apps.alerts.models import Alert, AuditLog
-from apps.customers.models import Customer
 from apps.transactions.models import Transaction
 from rules.base import BaseRule
 from rules.engine import RuleEngine
@@ -54,9 +51,7 @@ class TestRuleEngineComprehensive:
         engine = RuleEngine()
         request_meta = {"REMOTE_ADDR": "192.168.1.1", "HTTP_USER_AGENT": "Mozilla/5.0"}
 
-        result = engine.process_transaction(
-            transaction, user=user, request_meta=request_meta
-        )
+        engine.process_transaction(transaction, user=user, request_meta=request_meta)
 
         # Verify audit log was created with metadata
         audit_logs = AuditLog.objects.filter(transaction=transaction)
@@ -151,7 +146,11 @@ class TestModelsComprehensive:
 
     def test_transaction_str_method(self, transaction):
         """Test Transaction __str__ method"""
-        expected = f"{transaction.transaction_reference} - {transaction.customer.full_name} - {transaction.amount} {transaction.currency}"
+        expected = (
+            f"{transaction.transaction_reference} - "
+            f"{transaction.customer.full_name} - "
+            f"{transaction.amount} {transaction.currency}"
+        )
         assert str(transaction) == expected
 
     def test_alert_str_method(self, transaction):

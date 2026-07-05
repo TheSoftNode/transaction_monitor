@@ -73,7 +73,7 @@ class WebhookHandler(BaseHTTPRequestHandler):
 
         # Only handle push events to main branch
         if event == "push" and data.get("ref") == "refs/heads/main":
-            logging.info(f"Push to main detected - Triggering deployment")
+            logging.info("Push to main detected - Triggering deployment")
 
             try:
                 # Run deployment script in background

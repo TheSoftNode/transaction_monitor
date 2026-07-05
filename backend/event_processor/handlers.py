@@ -3,7 +3,6 @@ from typing import Any, Dict
 
 from django.utils import timezone
 
-from apps.alerts.models import AuditLog
 from apps.transactions.models import Transaction
 from rules.engine import RuleEngine
 

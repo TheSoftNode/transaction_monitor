@@ -1,9 +1,8 @@
 from decimal import Decimal
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import patch
 
 import pytest
 
-from apps.customers.models import Customer
 from apps.transactions.models import Transaction
 from event_processor.handlers import TransactionEventHandler
 

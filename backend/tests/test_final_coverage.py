@@ -4,15 +4,14 @@ This file tests all remaining uncovered code paths
 """
 
 from decimal import Decimal
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import patch
 
 import pytest
 from django.contrib.auth import get_user_model
 
 from apps.alerts.models import Alert, AuditLog
-from apps.alerts.serializers import AlertSerializer, AuditLogSerializer
+from apps.alerts.serializers import AlertSerializer
 from apps.authentication.serializers import RegisterSerializer
-from apps.customers.models import Customer
 from apps.customers.serializers import CustomerSerializer
 from apps.transactions.models import Transaction
 from apps.transactions.serializers import TransactionSerializer
@@ -84,7 +83,7 @@ class TestRuleEngineMissingLines:
         )
 
         engine = RuleEngine()
-        result = engine.process_transaction(transaction)
+        engine.process_transaction(transaction)
 
         # Should create audit log with null IP and user agent
         audit_log = AuditLog.objects.filter(transaction=transaction).first()
@@ -190,7 +189,7 @@ class TestEventProcessorMissingLines:
             handler = TransactionEventHandler()
             try:
                 handler.handle_transaction_created(event_data)
-            except:
+            except Exception:
                 pass  # Exception is expected
 
     @patch("event_processor.handlers.logger")
@@ -333,8 +332,8 @@ class TestRuleConfigMissingLines:
 
     def test_rule_config_ordering(self):
         """Test RuleConfiguration ordering"""
-        config1 = RuleConfiguration.objects.create(rule_name="Rule1", priority=50)
-        config2 = RuleConfiguration.objects.create(rule_name="Rule2", priority=100)
+        RuleConfiguration.objects.create(rule_name="Rule1", priority=50)
+        RuleConfiguration.objects.create(rule_name="Rule2", priority=100)
 
         configs = RuleConfiguration.objects.all().order_by("-priority")
         assert configs[0].priority >= configs[1].priority
