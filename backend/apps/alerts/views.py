@@ -6,8 +6,12 @@ from rest_framework.response import Response
 
 from .filters import AlertFilter, AuditLogFilter
 from .models import Alert, AuditLog
-from .serializers import (AlertListSerializer, AlertResolveSerializer,
-                          AlertSerializer, AuditLogSerializer)
+from .serializers import (
+    AlertListSerializer,
+    AlertResolveSerializer,
+    AlertSerializer,
+    AuditLogSerializer,
+)
 
 
 class AlertViewSet(viewsets.ModelViewSet):

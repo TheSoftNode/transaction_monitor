@@ -3,8 +3,10 @@ from decimal import Decimal
 import pytest
 from apps.alerts.models import Alert, AuditLog
 from apps.alerts.serializers import AlertSerializer, AuditLogSerializer
-from apps.authentication.serializers import (CustomTokenObtainPairSerializer,
-                                             RegisterSerializer)
+from apps.authentication.serializers import (
+    CustomTokenObtainPairSerializer,
+    RegisterSerializer,
+)
 from apps.customers.models import Customer
 from apps.customers.serializers import CustomerSerializer
 from apps.transactions.models import Transaction
