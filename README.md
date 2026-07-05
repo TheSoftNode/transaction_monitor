@@ -540,6 +540,7 @@ transaction-monitor/
 ### Interactive Documentation
 
 **Live (production):**
+
 - **Swagger UI**: https://safeguard.urisocial.com/api/schema/swagger-ui/
 - **ReDoc**: https://safeguard.urisocial.com/api/schema/redoc/
 - **OpenAPI Schema**: https://safeguard.urisocial.com/api/schema/
@@ -1009,8 +1010,8 @@ api_request_duration_seconds   # Request latency histogram
 ### Health Checks
 
 ```bash
-# Backend health
-curl http://localhost:8000/health/
+# Backend health (live). For local use http://localhost:8000/health/
+curl https://safeguard.urisocial.com/health/
 {
   "status": "healthy",
   "checks": {
@@ -1019,8 +1020,8 @@ curl http://localhost:8000/health/
   }
 }
 
-# Rust scorer health
-curl http://localhost:8001/health
+# Rust scorer health (internal service; local use http://localhost:8001/health)
+curl http://40.127.13.42:8001/health
 {
   "status": "ok"
 }
