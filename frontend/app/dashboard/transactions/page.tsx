@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Plus, CreditCard, TrendingUp, AlertTriangle, CheckCircle } from "lucide-react"
+import { Plus, CreditCard, TrendingUp, AlertTriangle, CheckCircle, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TransactionFilters } from "@/components/transactions/transaction-filters"
@@ -31,11 +31,12 @@ export default function TransactionsPage() {
       acc.total++
       if (t.status === "approved") acc.approved++
       if (t.status === "pending") acc.pending++
+      if (t.status === "under_review") acc.underReview++
       if (t.risk_score >= 70) acc.highRisk++
       return acc
     },
-    { total: 0, approved: 0, pending: 0, highRisk: 0 }
-  ) || { total: 0, approved: 0, pending: 0, highRisk: 0 }
+    { total: 0, approved: 0, pending: 0, underReview: 0, highRisk: 0 }
+  ) || { total: 0, approved: 0, pending: 0, underReview: 0, highRisk: 0 }
 
   return (
     <div className="space-y-6">
@@ -57,7 +58,7 @@ export default function TransactionsPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
         <Card className="bg-slate-900 border-slate-800">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-400">
@@ -85,12 +86,24 @@ export default function TransactionsPage() {
         <Card className="bg-slate-900 border-slate-800">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-400">
-              Pending Review
+              Pending
             </CardTitle>
-            <TrendingUp className="h-4 w-4 text-yellow-400" />
+            <TrendingUp className="h-4 w-4 text-blue-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-400">{stats.pending}</div>
+            <div className="text-2xl font-bold text-blue-400">{stats.pending}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-900 border-slate-800">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-400">
+              Under Review
+            </CardTitle>
+            <Search className="h-4 w-4 text-yellow-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-yellow-400">{stats.underReview}</div>
           </CardContent>
         </Card>
 
