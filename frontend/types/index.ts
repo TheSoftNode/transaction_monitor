@@ -1,5 +1,7 @@
 // API Base URL
-export const API_URL = "http://40.127.13.42:8000/api/v1"
+// Relative path so requests hit the Vercel origin over HTTPS and are
+// proxied to the backend server-side (see rewrites in next.config.ts).
+export const API_URL = "/api/v1"
 
 // Auth types
 export interface User {

@@ -28,7 +28,7 @@ export default function LoginPage() {
       localStorage.setItem("refresh_token", response.refresh)
 
       // Fetch user profile after login
-      const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://40.127.13.42:8000"}/api/v1/auth/user/`, {
+      const userResponse = await fetch(`/api/v1/auth/user/`, {
         headers: {
           Authorization: `Bearer ${response.access}`,
         },
