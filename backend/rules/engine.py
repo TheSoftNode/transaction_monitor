@@ -41,13 +41,12 @@ class RuleEngine:
     def evaluate_transaction(self, transaction: Transaction) -> dict:
         """
         Evaluate all rules against a transaction.
-        Uses Rust microservice if enabled, otherwise falls back to Python rules.
-        """
-        if self.use_rust_scorer:
-            rust_result = self._evaluate_with_rust(transaction)
-            if rust_result:
-                return rust_result
 
+        The Python rules always run so that alerts are generated for every
+        triggered rule. When the Rust risk scorer is enabled and available,
+        its risk score is used as the authoritative score while the
+        rule-based alerts are preserved.
+        """
         triggered_rules = []
         total_risk_score = 0
 
@@ -71,13 +70,20 @@ class RuleEngine:
                     f"Error evaluating rule {rule.name}: {str(e)}", exc_info=True
                 )
 
-        risk_score = min(total_risk_score, 100)
-
-        return {
+        result = {
             "triggered_rules": triggered_rules,
-            "risk_score": risk_score,
+            "risk_score": min(total_risk_score, 100),
             "rules_count": len(triggered_rules),
         }
+
+        if self.use_rust_scorer:
+            rust_result = self._evaluate_with_rust(transaction)
+            if rust_result:
+                # Rust provides the authoritative risk score; keep rule alerts.
+                result["risk_score"] = rust_result["risk_score"]
+                result["rust_result"] = rust_result.get("rust_result")
+
+        return result
 
     def _evaluate_with_rust(self, transaction: Transaction) -> Optional[dict]:
         """Evaluate transaction using Rust microservice"""
