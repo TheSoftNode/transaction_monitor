@@ -91,6 +91,7 @@ class TestAlertViewsExtended:
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data["status"] == "resolved"
+        alert.refresh_from_db()
         assert alert.resolved_by == user
         assert alert.resolved_at is not None
 

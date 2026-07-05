@@ -40,15 +40,20 @@ class TestTransactionWorkflow:
         assert transaction_response.status_code == status.HTTP_201_CREATED
         transaction_id = transaction_response.data["id"]
 
-        # Step 3: Verify transaction was created with initial risk score
-        transaction = Transaction.objects.get(id=transaction_id)
-        assert (
-            transaction.risk_score == 0
-        )  # Initially 0, will be updated by event processor
+        # Note: In real scenario, event processor would handle this async
+        # For testing, we manually trigger rule evaluation
+        from rules.engine import RuleEngine
 
-        # Step 4: Verify audit log was created
+        transaction = Transaction.objects.get(id=transaction_id)
+        engine = RuleEngine()
+        engine.process_transaction(transaction)
+
+        # Step 3: Verify transaction risk score (no rules trigger for a low-risk deposit)
+        transaction.refresh_from_db()
+        assert transaction.risk_score == 0
+
+        # Step 4: Verify audit log was created by the rule engine
         audit_logs = AuditLog.objects.filter(transaction=transaction)
-        # SQLite doesn't support JSONField contains lookup
         assert audit_logs.count() > 0
 
     def test_high_risk_transaction_creates_alert(self, authenticated_client, customer):
