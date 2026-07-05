@@ -2,6 +2,9 @@
 
 set -e
 
+# Always run from the repository root (this script lives in scripts/)
+cd "$(dirname "$0")/.."
+
 echo "╔════════════════════════════════════════════════════════════╗"
 echo "║   Transaction Monitor - Complete Infrastructure Test       ║"
 echo "╚════════════════════════════════════════════════════════════╝"
