@@ -113,6 +113,11 @@ export function CreateTransactionDialog({
 
     try {
       await createTransaction({
+        transaction_reference: `TXN${Date.now()}${Math.floor(
+          Math.random() * 1000
+        )
+          .toString()
+          .padStart(3, "0")}`,
         customer: customerId,
         amount: formData.amount,
         currency: formData.currency,
