@@ -9,6 +9,7 @@ import { CustomerList } from "@/components/customers/customer-list"
 import { CustomerPagination } from "@/components/customers/customer-pagination"
 import { CreateCustomerDialog } from "@/components/customers/create-customer-dialog"
 import { CustomerDetailsDialog } from "@/components/customers/customer-details-dialog"
+import { EditCustomerDialog } from "@/components/customers/edit-customer-dialog"
 import { useGetCustomersQuery } from "@/features/customers/api/customersApi"
 import type { Customer } from "@/types"
 
@@ -17,6 +18,7 @@ export default function CustomersPage() {
   const [search, setSearch] = useState("")
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
 
   const { data, isLoading } = useGetCustomersQuery({
     page,
@@ -126,6 +128,7 @@ export default function CustomersPage() {
             customers={data?.results}
             isLoading={isLoading}
             onViewDetails={setSelectedCustomer}
+            onEdit={setEditingCustomer}
           />
           <CustomerPagination
             currentPage={page}
@@ -144,6 +147,11 @@ export default function CustomersPage() {
         customer={selectedCustomer}
         open={!!selectedCustomer}
         onOpenChange={(open) => !open && setSelectedCustomer(null)}
+      />
+      <EditCustomerDialog
+        customer={editingCustomer}
+        open={!!editingCustomer}
+        onOpenChange={(open) => !open && setEditingCustomer(null)}
       />
     </div>
   )

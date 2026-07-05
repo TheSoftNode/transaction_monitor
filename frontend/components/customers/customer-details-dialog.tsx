@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import type { Customer } from "@/types"
+import { useGetCustomerQuery } from "@/features/customers/api/customersApi"
 import { cn } from "@/lib/utils"
 import { Shield, AlertCircle, Mail, Phone, MapPin, Calendar } from "lucide-react"
 
@@ -23,7 +24,15 @@ export function CustomerDetailsDialog({
   open,
   onOpenChange,
 }: CustomerDetailsDialogProps) {
+  // The list endpoint returns a partial customer (no phone/updated_at);
+  // fetch the full record so all fields render correctly.
+  const { data: fullCustomer } = useGetCustomerQuery(customer?.id as string, {
+    skip: !customer?.id || !open,
+  })
+
   if (!customer) return null
+
+  const c = fullCustomer ?? customer
 
   const getRiskColor = (level: string) => {
     switch (level) {
@@ -36,8 +45,10 @@ export function CustomerDetailsDialog({
     }
   }
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "\u2014"
     const date = new Date(dateString)
+    if (isNaN(date.getTime())) return "\u2014"
     return date.toLocaleString("en-US", {
       dateStyle: "long",
       timeStyle: "short",
@@ -58,12 +69,12 @@ export function CustomerDetailsDialog({
           {/* Header Section */}
           <div className="flex items-start justify-between">
             <div>
-              <h3 className="text-2xl font-bold text-white">{customer.full_name}</h3>
+              <h3 className="text-2xl font-bold text-white">{c.full_name}</h3>
               <p className="text-sm font-mono text-slate-400 mt-1">
-                {customer.customer_reference}
+                {c.customer_reference}
               </p>
             </div>
-            {customer.is_blacklisted ? (
+            {c.is_blacklisted ? (
               <Badge variant="outline" className="bg-red-500/10 text-red-400 border-red-500/20">
                 <AlertCircle className="h-3 w-3 mr-1" />
                 Blacklisted
@@ -80,17 +91,17 @@ export function CustomerDetailsDialog({
           <div className="space-y-3 border-t border-slate-800 pt-4">
             <div className="flex items-center gap-3 text-slate-300">
               <Mail className="h-4 w-4 text-slate-400" />
-              <span>{customer.email}</span>
+              <span>{c.email}</span>
             </div>
-            {customer.phone && (
+            {c.phone && (
               <div className="flex items-center gap-3 text-slate-300">
                 <Phone className="h-4 w-4 text-slate-400" />
-                <span>{customer.phone}</span>
+                <span>{c.phone}</span>
               </div>
             )}
             <div className="flex items-center gap-3 text-slate-300">
               <MapPin className="h-4 w-4 text-slate-400" />
-              <span>{customer.country_code}</span>
+              <span>{c.country_code}</span>
             </div>
           </div>
 
@@ -100,16 +111,16 @@ export function CustomerDetailsDialog({
               <p className="text-sm text-slate-400">Risk Level</p>
               <Badge
                 variant="outline"
-                className={cn("mt-2 capitalize", getRiskColor(customer.risk_level))}
+                className={cn("mt-2 capitalize", getRiskColor(c.risk_level))}
               >
-                {customer.risk_level}
+                {c.risk_level}
               </Badge>
             </div>
 
             <div>
               <p className="text-sm text-slate-400">Account Status</p>
               <p className="text-white font-medium mt-2">
-                {customer.is_blacklisted ? "Blacklisted" : "Active"}
+                {c.is_blacklisted ? "Blacklisted" : "Active"}
               </p>
             </div>
           </div>
@@ -120,14 +131,14 @@ export function CustomerDetailsDialog({
               <Calendar className="h-4 w-4 text-slate-400" />
               <div>
                 <p className="text-slate-400">Created</p>
-                <p className="text-white">{formatDate(customer.created_at)}</p>
+                <p className="text-white">{formatDate(c.created_at)}</p>
               </div>
             </div>
             <div className="flex items-center gap-3 text-sm">
               <Calendar className="h-4 w-4 text-slate-400" />
               <div>
                 <p className="text-slate-400">Last Updated</p>
-                <p className="text-white">{formatDate(customer.updated_at)}</p>
+                <p className="text-white">{formatDate(c.updated_at)}</p>
               </div>
             </div>
           </div>

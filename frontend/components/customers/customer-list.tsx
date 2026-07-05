@@ -1,6 +1,6 @@
 "use client"
 
-import { Eye, Shield, AlertCircle } from "lucide-react"
+import { Eye, Shield, AlertCircle, Pencil, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -13,15 +13,36 @@ import {
 } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
 import type { Customer } from "@/types"
+import { useDeleteCustomerMutation } from "@/features/customers/api/customersApi"
+import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
 interface CustomerListProps {
   customers?: Customer[]
   isLoading: boolean
   onViewDetails: (customer: Customer) => void
+  onEdit: (customer: Customer) => void
 }
 
-export function CustomerList({ customers, isLoading, onViewDetails }: CustomerListProps) {
+export function CustomerList({ customers, isLoading, onViewDetails, onEdit }: CustomerListProps) {
+  const [deleteCustomer, { isLoading: isDeleting }] = useDeleteCustomerMutation()
+
+  const handleDelete = async (customer: Customer) => {
+    if (
+      !window.confirm(
+        `Delete customer "${customer.full_name}" (${customer.customer_reference})? This cannot be undone.`
+      )
+    ) {
+      return
+    }
+    try {
+      await deleteCustomer(customer.id).unwrap()
+      toast.success("Customer deleted")
+    } catch (error: any) {
+      toast.error(error?.data?.detail || "Failed to delete customer")
+    }
+  }
+
   const getRiskColor = (level: string) => {
     switch (level) {
       case "high":
@@ -114,14 +135,36 @@ export function CustomerList({ customers, isLoading, onViewDetails }: CustomerLi
                 {formatDate(customer.created_at)}
               </TableCell>
               <TableCell className="text-right">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onViewDetails(customer)}
-                  className="text-slate-400 hover:text-white hover:bg-slate-700"
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center justify-end gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onViewDetails(customer)}
+                    aria-label="View customer"
+                    className="text-slate-400 hover:text-white hover:bg-slate-700"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onEdit(customer)}
+                    aria-label="Edit customer"
+                    className="text-slate-400 hover:text-violet-400 hover:bg-slate-700"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDelete(customer)}
+                    disabled={isDeleting}
+                    aria-label="Delete customer"
+                    className="text-slate-400 hover:text-red-400 hover:bg-slate-700"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
