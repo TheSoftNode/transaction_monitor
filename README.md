@@ -368,14 +368,14 @@ http://localhost:8000/admin
 ### 7. Test API
 
 ```bash
-# Login to get JWT token
-curl -X POST http://localhost:8000/api/v1/auth/login/ \
+# Login to get a JWT token (live API; for local use http://localhost:8000)
+curl -X POST https://safeguard.urisocial.com/api/v1/auth/login/ \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"your_password"}'
 
-# Use token for authenticated requests
+# Use the token for authenticated requests
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-  http://localhost:8000/api/v1/transactions/
+  https://safeguard.urisocial.com/api/v1/transactions/
 ```
 
 ---
@@ -539,9 +539,12 @@ transaction-monitor/
 
 ### Interactive Documentation
 
-- **Swagger UI**: http://localhost:8000/api/schema/swagger-ui/
-- **ReDoc**: http://localhost:8000/api/schema/redoc/
-- **OpenAPI Schema**: http://localhost:8000/api/schema/
+**Live (production):**
+- **Swagger UI**: https://safeguard.urisocial.com/api/schema/swagger-ui/
+- **ReDoc**: https://safeguard.urisocial.com/api/schema/redoc/
+- **OpenAPI Schema**: https://safeguard.urisocial.com/api/schema/
+
+_Local (after `docker compose up`): use `http://localhost:8000` instead of the domain._
 
 ### Authentication
 
