@@ -1,6 +1,6 @@
 "use client"
 
-import { Eye } from "lucide-react"
+import { Eye, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
 import type { AlertListItem } from "@/types"
+import { useResolveAlertMutation } from "@/features/alerts/api/alertsApi"
+import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
 interface AlertListProps {
@@ -22,6 +24,17 @@ interface AlertListProps {
 }
 
 export function AlertList({ alerts, isLoading, onViewDetails }: AlertListProps) {
+  const [resolveAlert, { isLoading: isResolving }] = useResolveAlertMutation()
+
+  const handleResolve = async (id: string) => {
+    try {
+      await resolveAlert({ id, status: "resolved" }).unwrap()
+      toast.success("Alert resolved")
+    } catch (error: any) {
+      toast.error(error?.data?.detail || "Failed to resolve alert")
+    }
+  }
+
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case "critical":
@@ -120,14 +133,29 @@ export function AlertList({ alerts, isLoading, onViewDetails }: AlertListProps) 
                 {formatDate(alert.triggered_at)}
               </TableCell>
               <TableCell className="text-right">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onViewDetails(alert)}
-                  className="text-slate-400 hover:text-white hover:bg-slate-700"
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center justify-end gap-1">
+                  {(alert.status === "open" ||
+                    alert.status === "investigating") && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleResolve(alert.id)}
+                      disabled={isResolving}
+                      className="h-8 text-green-400 hover:text-green-300 hover:bg-slate-700"
+                    >
+                      <CheckCircle className="h-4 w-4 mr-1" />
+                      Resolve
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onViewDetails(alert)}
+                    className="text-slate-400 hover:text-white hover:bg-slate-700"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
