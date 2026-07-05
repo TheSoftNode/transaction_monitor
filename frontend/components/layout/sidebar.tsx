@@ -53,7 +53,7 @@ export function Sidebar() {
       >
         <div className="flex h-20 items-center justify-between px-6 border-b border-slate-800/50">
           {!collapsed && (
-            <Link href="/dashboard/transactions" className="flex items-center space-x-3">
+            <Link href="/" className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-violet-500 rounded-xl flex items-center justify-center shadow-lg shadow-violet-600/20">
                 <Shield className="h-6 w-6 text-white" />
               </div>
@@ -61,9 +61,11 @@ export function Sidebar() {
             </Link>
           )}
           {collapsed && (
-            <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-violet-500 rounded-xl flex items-center justify-center mx-auto shadow-lg shadow-violet-600/20">
-              <Shield className="h-6 w-6 text-white" />
-            </div>
+            <Link href="/" className="mx-auto">
+              <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-violet-500 rounded-xl flex items-center justify-center shadow-lg shadow-violet-600/20">
+                <Shield className="h-6 w-6 text-white" />
+              </div>
+            </Link>
           )}
           <Button
             variant="ghost"
