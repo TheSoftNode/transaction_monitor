@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "apps.monitoring",
     "rules",
     "core",
+    "infrastructure.messaging",
 ]
 
 MIDDLEWARE = [

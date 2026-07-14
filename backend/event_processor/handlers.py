@@ -19,6 +19,12 @@ class TransactionEventHandler:
         - Evaluate rules
         - Update risk score
         - Create alerts if needed
+
+        Idempotent: Kafka's at-least-once delivery means this can run more
+        than once for the same transaction (e.g. redelivery after a crash).
+        `processed_at` doubles as a "have I already done this" guard so a
+        redelivered event is a no-op instead of creating duplicate alerts
+        and audit log entries.
         """
         transaction_id = event_data.get("transaction_id")
         if not transaction_id:
@@ -30,6 +36,13 @@ class TransactionEventHandler:
                 id=transaction_id
             )
 
+            if transaction.processed_at is not None:
+                logger.info(
+                    f"Transaction {transaction.transaction_reference} already "
+                    "processed; skipping duplicate delivery"
+                )
+                return
+
             logger.info(f"Processing transaction: {transaction.transaction_reference}")
 
             result = self.rule_engine.process_transaction(transaction)
@@ -40,9 +53,8 @@ class TransactionEventHandler:
                 f"Alerts Created: {result['rules_count']}"
             )
 
-            if result["rules_count"] > 0:
-                transaction.processed_at = timezone.now()
-                transaction.save(update_fields=["processed_at"])
+            transaction.processed_at = timezone.now()
+            transaction.save(update_fields=["processed_at"])
 
         except Transaction.DoesNotExist:
             logger.error(f"Transaction not found: {transaction_id}")

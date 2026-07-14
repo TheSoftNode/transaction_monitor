@@ -55,8 +55,13 @@ class KafkaMessageConsumer(BaseMessageConsumer):
                 group_id=self.group_id,
                 value_deserializer=lambda m: json.loads(m.decode("utf-8")),
                 auto_offset_reset="earliest",
-                enable_auto_commit=True,
-                auto_commit_interval_ms=1000,
+                # Commit offsets manually, only after the callback succeeds
+                # (see start()). Auto-commit fires on a timer independent of
+                # whether processing finished, which can either skip a
+                # message that was still being processed when the process
+                # crashed (silent loss) or re-commit past one that failed
+                # (never retried) - neither is a guarantee we want.
+                enable_auto_commit=False,
             )
         self.consumer.subscribe(list(self.callbacks.keys()))
 
@@ -84,11 +89,21 @@ class KafkaMessageConsumer(BaseMessageConsumer):
                 if topic in self.callbacks:
                     try:
                         self.callbacks[topic](value)
+                        # Only advance the committed offset once the handler
+                        # has actually finished. If we crash before this
+                        # line, the message is redelivered on restart
+                        # (at-least-once) instead of silently skipped.
+                        self.consumer.commit()
                     except Exception as e:
                         logger.error(
-                            f"Error processing message from {topic}: {str(e)}",
+                            f"Error processing message from {topic}: {str(e)}. "
+                            "Offset not committed; message will be redelivered.",
                             exc_info=True,
                         )
+                else:
+                    # No handler registered for this topic - nothing to
+                    # retry, so commit to avoid reprocessing it forever.
+                    self.consumer.commit()
         except Exception as e:
             logger.error(f"Consumer error: {str(e)}", exc_info=True)
         finally:
