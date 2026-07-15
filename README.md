@@ -136,7 +136,7 @@ A production-grade transaction monitoring platform with real-time risk assessmen
 #### Infrastructure as Code
 
 - **Kubernetes Manifests**: Complete K8s deployment configurations
-- **Terraform**: Infrastructure provisioning (AWS-based)
+- **Terraform**: Infrastructure provisioning (Azure-based, via `azurerm`)
 
 ---
 
@@ -297,7 +297,7 @@ Kafka Consumer (Event Processor)
 - **GitHub Actions**: CI/CD
 - **Azure VM**: Production hosting
 - **Kubernetes**: Orchestration manifests (prepared)
-- **Terraform**: Infrastructure as Code (AWS, needs Azure conversion)
+- **Terraform**: Infrastructure as Code (Azure, via AKS/Azure Database for PostgreSQL/Azure Cache for Redis/Event Hubs)
 
 ---
 
@@ -460,7 +460,7 @@ transaction-monitor/
 │   │   │   ├── services/
 │   │   │   ├── configmaps/
 │   │   │   └── ingress/
-│   │   └── terraform/           # Terraform (AWS)
+│   │   └── terraform/           # Terraform (Azure)
 │   │       ├── main.tf
 │   │       ├── modules/
 │   │       └── terraform.tfvars.example
